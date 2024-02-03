@@ -1,0 +1,219 @@
+local game_info = require("game/game_info")
+local common_vars = require("common")
+
+local function anim1(node, d)
+	-- set scale to 70%
+	local start_scale = 0.7
+	gui.set_scale(node, vmath.vector4(start_scale, start_scale, start_scale, 0))
+
+	-- get current color and set alpha to 0 to fade up
+	local from_color = gui.get_color(node)
+	local to_color = gui.get_color(node)
+	from_color.w = 0
+	gui.set_color(node, from_color)
+
+	-- animate alpha value from 0 to 1
+	gui.animate(node, gui.PROP_COLOR, to_color, gui.EASING_IN, 0.4, d)
+
+	-- animate scale from %70 to 110%
+	local s = 1.1
+	gui.animate(node, gui.PROP_SCALE, vmath.vector4(s, s, s, 0), gui.EASING_IN, 0.4, d, anim2)
+end
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	print("gui url: "..msg.url())	
+	gui.set_text (gui.get_node("score"), string.format("PTS %05d", 0))
+	self.btn_pause = gui.get_node("btn_pause")		
+	self.btn_continue = gui.get_node("btn_continue")
+	self.btn_abort = gui.get_node("btn_abort")
+
+	self.btn_left = gui.get_node("btn_left")		
+	self.btn_right = gui.get_node("btn_right")
+	self.btn_fire = gui.get_node("btn_fire")
+
+	self.is_game_over=false
+	self.game_over_key_timer=2
+	self.countdown_counter=4
+	self.show_countdown=false
+	
+	gui.set_visible(gui.get_node("txt_new_high"), false)	
+	if not common_vars.is_mobile then
+		gui.set_enabled(gui.get_node("panel_controls"), false)	
+		gui.set_visible(gui.get_node("panel_controls"), false)		
+	end
+end
+
+function final(self)
+	msg.post(".", "release_input_focus")
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Learn more: https://defold.com/manuals/script/
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	--score animation
+	if self.is_game_over then
+		if self.game_over_key_timer > 0 then 
+			self.game_over_key_timer = self.game_over_key_timer - 1/60
+		end
+	end
+
+	if self.show_countdown then
+		self.countdown_counter = self.countdown_counter-1/60 --dt
+		local s= string.format("%d", self.countdown_counter)
+		if (s=="0") then s="GO" end
+		gui.set_text(gui.get_node("text_countdown"),s)
+		local txtScale=gui.get_scale(gui.get_node("text_level"))
+		if txtScale.x<1.2 then
+			txtScale.x = txtScale.x + 1/60
+			txtScale.y = txtScale.y + 1/60
+			gui.set_scale(gui.get_node("text_level"), txtScale)
+		end
+		
+		if self.countdown_counter<=0 then
+			self.show_countdown=false
+			gui.set_enabled(gui.get_node("text_countdown"), false)
+			gui.set_enabled(gui.get_node("text_level"), false)
+			msg.post("/manager#manager", "countdown_ended")
+		end
+	end
+end
+
+function on_input(self, action_id, action)
+	-- when showing countdown, do not listen for input
+	if self.show_countdown then return end
+	if action_id == hash("touch") then print "touch!" end
+	if self.is_game_over and self.game_over_key_timer<=0 then		
+		if (action_id == hash("touch") or action_id==hash("escape") or action_id==hash("fire")) and action.released then
+			msg.post("/manager#manager", "abort")
+		end
+	end
+	
+	if action_id==hash("escape") and action.released then		
+		if self.is_game_over then 
+			msg.post("/manager#manager", "abort")
+		else
+			msg.post("/manager#manager", "pause")
+		end
+	end
+	
+	if action_id == hash("touch") then -- or action_id == hash("multitouch") then
+		if action.released then
+			gui.set_scale(self.btn_pause, vmath.vector4(1, 1, 1, 0))
+			gui.set_scale(self.btn_continue, vmath.vector4(1, 1, 1, 0))
+			gui.set_scale(self.btn_abort, vmath.vector4(1, 1, 1, 0))
+		end
+		if gui.pick_node(self.btn_pause, action.x, action.y) and not self.is_game_over then
+			if action.pressed then
+				gui.set_scale(self.btn_pause, vmath.vector4(1.2, 1.2, 1, 0))
+			end			
+			if action.released then
+				msg.post("/manager#manager", "pause")
+			end			
+		end
+		if gui.is_enabled(gui.get_node("panel_pause")) and gui.pick_node(self.btn_continue, action.x, action.y) then
+			if action.pressed then
+				gui.set_scale(self.btn_continue, vmath.vector4(1.2, 1.2, 1, 0))
+			end			
+			if action.released then
+				msg.post("/manager#manager", "pause")
+			end	
+		end
+		if gui.is_enabled(gui.get_node("panel_pause")) and gui.pick_node(self.btn_abort, action.x, action.y) then
+			if action.pressed then
+				gui.set_scale(self.btn_abort, vmath.vector4(1.2, 1.2, 1, 0))		
+			end			
+			if action.released then
+				msg.post("/manager#manager", "abort")
+			end																
+		end		
+
+		-- on screen controls
+		if gui.is_enabled(gui.get_node("panel_controls")) then
+			--if action.pressed then
+				if gui.pick_node(self.btn_left, action.x, action.y) then
+					msg.post("/manager#manager", "player_move_left")
+				end
+				if gui.pick_node(self.btn_right, action.x, action.y) then
+					msg.post("/manager#manager", "player_move_right")
+				end
+				if gui.pick_node(self.btn_fire, action.x, action.y) and action.pressed then
+					msg.post("/manager#manager", "player_fire")
+				end
+			--end			
+		end
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("countdown") then
+		self.show_countdown=true
+		self.countdown_counter=4
+		gui.set_text(gui.get_node("text_level"), "Level "..game_info.level)
+		gui.set_enabled(gui.get_node("text_countdown"), true)
+		gui.set_enabled(gui.get_node("text_level"), true)
+		gui.set_scale(gui.get_node("text_level"), vmath.vector4(0.1,0.1,1,0))
+	end
+
+	if message_id == hash("new_high") then
+		gui.set_visible(gui.get_node("txt_new_high"), true)
+	end
+	
+	if message_id == hash("update_score") then
+		gui.set_text (gui.get_node("score"), string.format("PTS %05d", message.score))
+	end	
+	
+	if message_id == hash("update_lives") then
+		gui.set_text (gui.get_node("lives"), string.format("LIVES %d", message.lives))
+		for i=1,5 do
+			local nd=gui.get_node("life"..tostring(i))
+			local state = (i<=message.lives)			
+			gui.set_enabled(nd, state)
+		end
+	end
+
+	if message_id == hash("update_bullets") then
+		for i=1,9 do
+			local nd=gui.get_node("bullet"..tostring(i))
+			local state = (i<=message.bullets)			
+			gui.set_enabled(nd, state)
+		end
+	end
+		
+	if message_id == hash("game_over") then
+		gui.set_enabled(gui.get_node("panel_game_over"), message.state)		
+		if message.state == true then 
+			self.is_game_over=true
+			self.game_over_key_timer=2
+			local acc = 0
+			local acc_text= "0%"
+			--set self.bonus points to add in score (animation on update)
+			if game_info.shots_fired>0 then 
+				acc=game_info.shots_hit*100/game_info.shots_fired 
+				acc_text=string.format("Accuracy: %02d%% (%d of %d)",acc,game_info.shots_hit,game_info.shots_fired)
+			end
+						
+			gui.set_text(gui.get_node("txt_score"), "Final score: "..game_info.score.." pts")
+			gui.set_text(gui.get_node("txt_accuracy"), acc_text)
+		end
+	end
+	if message_id == hash("pause") and not self.is_game_over then
+		print("GUI received pause message with state = "..tostring(message.state))
+		gui.set_enabled(gui.get_node("panel_pause"), message.state)
+		if message.state then			
+			gui.play_flipbook(gui.get_node("pause_image"), "play")
+		else
+			gui.play_flipbook(gui.get_node("pause_image"), "pause")
+		end
+	end
+end
+
+function on_reload(self)
+	-- Add reload-handling code here
+	-- Learn more: https://defold.com/manuals/hot-reload/
+	-- Remove this function if not needed
+end

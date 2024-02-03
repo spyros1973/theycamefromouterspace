@@ -1,0 +1,280 @@
+local common_vars = require("common")
+local game_info = require("game/game_info")
+local levels = require("levels")
+local high_score = require("highscore")
+
+function start_level(self)
+	game_info.mode="pregame" -- play | pause | gameover | pregame
+	self.enemies=spawn_enemies(self)	
+	self.enemies_counter=#self.enemies
+	self.edge_reached_timer=0
+	self.ufo_timer=11+math.random(1,5)	
+	self.enemy_bullet_counter=0
+	self.enemy_bullet_timer=0
+	self.enemy_bullets={}
+	msg.post("#game", "update_bullets",{bullets = game_info.player_max_bullets})	
+	msg.post("#game", "update_lives",{lives = game_info.lives})	
+	msg.post("#game", "pause",{state = false})	
+	msg.post("#game", "game_over",{state = false})	
+	msg.post("#game", "countdown")
+	msg.post("startup:/handler#game", "set_time_step", {factor = 0, mode = 1})		
+	--spawn_ufo(self) --for testing
+	
+end
+
+function start_game(self)
+	game_info.reset()
+	start_level(self)
+end
+
+function init(self)
+	self.player=nil
+	start_game(self)
+	if common_vars.is_mobile then
+		print "running on mobile"
+	else
+		print "not running on mobile"
+	end
+end
+
+function update(self, dt)
+	if self.edge_reached_timer>0 then 
+		self.edge_reached_timer = self.edge_reached_timer - dt 
+		if self.edge_reached_timer < 0 then self.edge_reached_timer = 0 end
+	end
+
+	self.ufo_timer = self.ufo_timer - dt
+	if self.ufo_timer <= 0 then --add random element
+		spawn_ufo(self)
+	end
+
+	self.enemy_bullet_timer = self.enemy_bullet_timer + dt
+	if self.enemy_bullet_timer > levels[game_info.level].enemy_fire_frequency+math.random(3)/2 then --add random element
+		self.enemy_bullet_timer=0
+		fire_enemy_bullet(self)
+	end
+end
+
+function on_message(self, message_id, message, sender)	
+	if message_id == hash("countdown_ended") then
+		msg.post("startup:/handler#game", "set_time_step", {factor = 1, mode = 1})		
+		game_info.mode="play"
+	end
+	if message_id == hash("player_subscribe") then
+		self.player=sender
+	end
+	if message_id == hash("proxy_loaded") then
+		msg.post(sender, "enable")
+	end	
+	if message_id==hash("player_move_left") then
+		msg.post(self.player, "go_left")
+	end
+	if message_id==hash("player_move_right") then
+		msg.post(self.player, "go_right")
+	end
+	if message_id==hash("player_fire") then
+		msg.post(self.player, "fire")
+	end
+	
+	if message_id==hash("pause") then
+		if game_info.mode == "pause" then game_info.mode = "play" else game_info.mode = "pause" end
+		local factor = (game_info.mode == "pause") and 0 or 1
+		msg.post("startup:/handler#game", "set_time_step", {factor = factor, mode = 1})
+		msg.post("#game", "pause",{state = (game_info.mode == "pause")})
+	end
+	
+	if message_id == hash("ufo_destroyed") then
+		game_info.score = game_info.score+50
+		game_info.shots_hit = game_info.shots_hit+1
+		msg.post("#game", "update_score",{score = game_info.score})	
+	end
+	
+	if message_id == hash("enemy_destroyed") then
+		game_info.shots_hit = game_info.shots_hit+1
+		local idxToRemove
+		for i = 1, #self.enemies do
+			if (self.enemies[i] == sender.path) then
+				idxToRemove = i
+				break
+			end
+		end
+		if idxToRemove then
+			--print ("removed "..tostring(idxToRemove))
+			table.remove(self.enemies, idxToRemove)
+		end
+		print ("Enemy destroyed - remaining "..tostring(#self.enemies))
+		if #self.enemies > 2 then
+			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase) -- should be a level parameter
+		elseif #self.enemies == 2 then
+			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+2)
+		else
+			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+4)
+		end
+		
+		game_info.score = game_info.score+15
+		msg.post("#game", "update_score",{score = game_info.score})
+		self.enemies_counter = self.enemies_counter-1
+		if (self.enemies_counter == 0) then
+			print ("all enemies destroyed")
+			timer.delay(1, false, function()
+				game_info.level = game_info.level+1
+				if game_info.level>#levels then
+					--show show won screen/message
+					msg.post("startup:/handler#startup", "show_menu")
+				else
+					msg.post(self.player, "remove_bullets")
+					remove_enemy_bullets(self)
+					start_level(self)
+				end
+			end)			
+		end
+	end
+
+	if message_id == hash("enemy_bullet_destroyed") then
+		self.enemy_bullet_counter=self.enemy_bullet_counter-1
+		local i=1
+		for key, val in pairs(self.enemy_bullets) do
+			if val == sender.path then 
+				table.remove(self.enemy_bullets,i)
+			end
+			i = i+1
+		end	
+		
+	end
+	
+	if message_id == hash("player_bullets_changed") then
+		msg.post("#game", "update_bullets",{bullets=game_info.player_max_bullets})
+	end
+	
+	if message_id == hash("player_hit") then
+		game_info.lives = game_info.lives-1
+		msg.post("#game", "update_lives",{lives = game_info.lives})	
+		if game_info.lives == 0 then
+			timer.delay(1, false, function()
+				msg.post(".", "game_over")
+			end)			
+		end
+		freeze_enemies(self)
+	end
+		
+	if message_id == hash("game_over") then
+		print("Game over")
+		print("Shots: "..tostring(game_info.shots_hit).." / "..tostring(game_info.shots_fired))
+		game_info.mode="gameover"
+		--self.state="gameover"
+		msg.post("startup:/handler#game", "set_time_step", {factor = 0, mode = 1})	
+		msg.post("#game", "game_over",{state = true})
+		local hi=high_score.load()
+		if game_info.score>hi then
+			high_score.save(game_info.score)
+			msg.post("#game", "new_high")
+			-- a message would be nice
+		end		
+	end
+
+	if message_id == hash("abort") then
+		print ("manager received abort message")
+		msg.post("startup:/handler#startup", "show_menu")
+	end
+
+	if message_id == hash("player_ready") then
+		unfreeze_enemies(self)
+	end
+	
+	if message_id == hash("edge_reached") and self.edge_reached_timer == 0 then
+		--fire_enemy_bullet(self) --for testing, should be determined by a counter that decreases as fewer enemies remain
+		self.edge_reached_timer = 1
+		local dir = 1
+		if message.edge == "right" then dir = -1 end
+		move_enemies_down(self,dir)
+	end	
+end
+
+function remove_enemy_bullets(self)
+	for key, val in pairs(self.enemy_bullets) do
+		go.delete(val)		
+	end		
+end
+
+function freeze_enemies(self)
+	for key, val in pairs(self.enemies) do
+		msg.post(msg.url(msg.url().socket,val,"enemy"), "freeze")
+	end	
+end
+
+function unfreeze_enemies(self)
+	for key, val in pairs(self.enemies) do
+		msg.post(msg.url(msg.url().socket,val,"enemy"), "unfreeze")
+	end	
+end
+
+function move_enemies_down(self,dir)
+	for key, val in pairs(self.enemies) do
+		go.set(msg.url(msg.url().socket,val,"enemy"), "dir", dir)
+		local pos=go.get_position(val)
+		pos.y = pos.y - levels[game_info.level].vertical_speed
+		go.set_position(pos,val)
+	end
+end
+
+function make_enemies_faster(self,increment)
+	for key, val in pairs(self.enemies) do
+		local speed=go.get(msg.url(msg.url().socket,val,"enemy"), "speed")
+		speed = speed +  levels[game_info.level].enemy_speed_increase
+		go.set(msg.url(msg.url().socket,val,"enemy"), "speed", speed)
+	end
+end
+
+function fire_enemy_bullet(self)
+	--locate bottom row, should be second to bottom, like the original
+	local lowest_y=5000	
+	for key, val in pairs(self.enemies) do
+		local pos=go.get_position(msg.url(msg.url().socket,val,"enemy"))
+		lowest_y=math.min(pos.y, lowest_y)
+	end
+	if lowest_y == 5000 then return end
+	local bottom_aliens={}
+	for key, val in pairs(self.enemies) do
+		local pos=go.get_position(msg.url(msg.url().socket,val,"enemy"))
+		if pos.y == lowest_y then
+			table.insert(bottom_aliens, val)
+		end
+	end
+		
+	local shooter=math.random(1,#bottom_aliens)
+	local pos=go.get_position(msg.url(msg.url().socket,bottom_aliens[shooter],"enemy"))
+	--msg.post(msg.url(msg.url().socket,bottom_aliens[shooter],"enemy"), "fire",{speed=levels[game_info.level].enemy_bullet_speed})
+	local bullet=factory.create("#enemy_bullet_factory",pos)		
+	msg.post(bullet, "subscribe",  { parent_url = msg.url() })
+	go.set(msg.url(msg.url().socket,bullet,"enemy_bullet"), "speed", levels[game_info.level].enemy_bullet_speed)			
+	table.insert(self.enemy_bullets, bullet)
+	self.enemy_bullet_counter=self.enemy_bullet_counter+1
+end
+
+function spawn_ufo(self)
+	local pos=vmath.vector3(-60,common_vars.screen_height-100,0)
+	local enemy=factory.create("#ufoFactory",pos)
+	msg.post(enemy, "subscribe",  { parent_url = msg.url() })
+	self.ufo_timer=11+math.random(1,5)	
+end
+
+function spawn_enemies(self)
+	local ret={}
+	local step_x=common_vars.screen_width/8
+	local start_y=common_vars.screen_height-110
+	local step_y=44
+	for i = 1,levels[game_info.level].columns do
+		for n = 1,levels[game_info.level].rows do
+			local posTarget = vmath.vector3(i * step_x,start_y-n*step_y,0)
+			local posStart = vmath.vector3(posTarget.x, posTarget.y + 400 ,0)
+			local enemy = factory.create("#enemyFactory",posStart)
+			go.set(msg.url(msg.url().socket,enemy,"enemy"), "speed", levels[game_info.level].horizontal_speed)
+			table.insert(ret,enemy)			
+			--msg.post(msg.url(msg.url().socket,enemy,"sprite"), "play_animation", {id = hash(levels[self.level].enemies[n])})
+			msg.post(enemy, "set_sprite",{sprite = levels[game_info.level].enemies[n]})
+			msg.post(enemy, "subscribe", { parent_url = msg.url() }) --working
+			go.animate(enemy, "position.y",go.PLAYBACK_ONCE_FORWARD, posTarget.y, go.EASING_LINEAR, 1)
+		end
+	end
+	return ret
+end

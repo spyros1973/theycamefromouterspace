@@ -1,0 +1,24 @@
+[bootstrap]
+main_collection = /startup.collectionc
+
+[script]
+shared_state = 1
+
+[display]
+width = 270
+height = 640
+fullscreen = 0
+
+[android]
+input_method = HiddenInputField
+package = gr.paraschis.invaders
+app_icon_192x192 = /assets/GameIcon_192.png
+
+[project]
+title = Invaders
+developer = Spyros Paraschis
+
+[graphics]
+default_texture_min_filter = nearest
+default_texture_mag_filter = nearest
+

@@ -1,0 +1,18 @@
+go.property("bonus_type",hash("missile"))
+
+function init(self)
+	--randomly choose bonus type - use game_info to detect if a life bonus is valid
+	--change sprite and type property accordingly
+	--on collison with player, the property will be used
+	go.animate(".", "position.y", go.PLAYBACK_ONCE_FORWARD, -10, go.EASING_LINEAR, 2,0,function ()
+		go.delete()
+	end)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id==hash("trigger_response") and message.enter then
+		--msg.post("/player#player", "bonus_destroyed")
+		go.delete()
+		--particlefx.play("#explosion")
+	end
+end

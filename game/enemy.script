@@ -1,0 +1,69 @@
+local vars=require("common")
+
+go.property("dir", 1)
+go.property("speed", 2)
+
+function init(self)
+	self.parent=nil
+	self.is_alive=true
+	self.is_frozen=false
+end
+
+function on_message(self, message_id, message, sender)	
+	if message_id==hash("trigger_response") and message.enter and not self.isHit then
+		msg.post(self.parent, "enemy_destroyed")
+		msg.post("#collisionobject", "disable")
+		self.is_alive=false
+		sprite.play_flipbook ("#sprite","enemy1_explosion",function()
+			go.delete()
+		end)	
+	end
+
+	if message_id==hash("subscribe") then
+		self.parent=message.parent_url
+	end
+
+	if message_id==hash("set_sprite") then
+		msg.post("#sprite", "play_animation", {id = hash(message.sprite)})
+	end	
+	
+	if message_id==hash("fire") then
+		-- not used, firing handled from manager script
+		local bullet=factory.create("#bulletFactory",pos)		
+		msg.post(bullet, "subscribe",  { parent_url = self.parent })
+		go.set(msg.url(msg.url().socket,bullet,"enemy_bullet"), "speed", message.speed)			
+	end
+
+	if message_id==hash("freeze") then
+		self.is_frozen=true
+	end
+
+	if message_id == hash("unfreeze") then
+		self.is_frozen=false
+	end
+end
+
+function update( self, dt)
+	if not self.is_alive then return end
+	if self.is_frozen then return end
+	local pos=go.get_position()
+	pos.x=pos.x + self.dir * self.speed * dt
+	if pos.x>vars.screen_width-8 then
+		msg.post(self.parent, "edge_reached",{edge="right"})
+	end
+
+	if pos.x<8 then
+		msg.post(self.parent, "edge_reached",{edge="left"})
+	end
+
+	go.set_position(pos)
+end
+
+if message_id==hash("freeze") then
+	self.is_frozen=true
+end
+
+if message_id == hash("unfreeze") then
+	self.is_frozen=false
+end
+	

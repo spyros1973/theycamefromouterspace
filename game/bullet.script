@@ -1,0 +1,22 @@
+common_vars=require("common")
+
+function init(self)
+	--self.parent=nil
+	go.animate(".", "position.y",go.PLAYBACK_ONCE_FORWARD , common_vars.screen_height+10, go.EASING_LINEAR, 1.5,0,function()
+		msg.post("main:/player#player", "bullet_destroyed")
+		go.delete()		
+	end)	
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id==hash("trigger_response") and message.enter then
+		msg.post("/player#player", "bullet_destroyed")
+		go.delete()
+		particlefx.play("#explosion")
+	end
+
+	--if message_id==hash("subscribe") then
+	--	self.parent=message.parent_url;
+	--end
+end
+

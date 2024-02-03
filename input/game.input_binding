@@ -1,0 +1,28 @@
+key_trigger {
+  input: KEY_LEFT
+  action: "left"
+}
+key_trigger {
+  input: KEY_RIGHT
+  action: "right"
+}
+key_trigger {
+  input: KEY_SPACE
+  action: "fire"
+}
+key_trigger {
+  input: KEY_ESC
+  action: "escape"
+}
+key_trigger {
+  input: KEY_BACK
+  action: "escape"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_1
+  action: "touch"
+}
+touch_trigger {
+  input: TOUCH_MULTI
+  action: "multitouch"
+}
