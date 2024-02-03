@@ -20,7 +20,7 @@ end
 function start_level(self)
 	game_info.mode="pregame" -- play | pause | gameover | pregame
 	self.enemies=spawn_enemies(self)	
-	self.enemies_counter=#self.enemies
+	--self.enemies_counter=#self.enemies
 	self.edge_reached_timer=0
 	self.ufo_timer=11+math.random(1,5)	
 	self.enemy_bullet_counter=0
@@ -34,11 +34,11 @@ function start_level(self)
 	msg.post("#game", "countdown")
 	msg.post("startup:/handler#game", "set_time_step", {factor = 0, mode = 1})		
 	--spawn_ufo(self) --for testing
-	
 end
 
 function start_game(self)
 	game_info.reset()
+	game_info.level = 3
 	start_level(self)
 end
 
@@ -119,34 +119,35 @@ function on_message(self, message_id, message, sender)
 			table.remove(self.enemies, idxToRemove)
 		end
 		print ("Enemy destroyed - remaining "..tostring(#self.enemies))
-		if #self.enemies > 2 then
-			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase) -- should be a level parameter
-		elseif #self.enemies == 2 then
-			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+2)
-		elseif #self.enemies == 1 then
-			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+8)
-		end
 		
-		game_info.score = game_info.score+15
+		game_info.score = game_info.score+message.points
 		msg.post("#game", "update_score",{score = game_info.score})
-		self.enemies_counter = self.enemies_counter-1
-		if (self.enemies_counter == 0) then
+		--self.enemies_counter = self.enemies_counter-1
+		if (#self.enemies == 0) then
 			print ("all enemies destroyed")
 			timer.delay(1, false, function()
-				game_info.level = game_info.level+1
-				if game_info.level>#levels then
+				
+				if game_info.level == #levels then
 					--show show won screen/message
 					msg.post("startup:/handler#startup", "show_menu")
 				else
+					game_info.level = game_info.level+1
 					msg.post(self.player, "remove_bullets")
 					remove_enemy_bullets(self)
 					start_level(self)
 				end
 			end)			
-		end
+		elseif #self.enemies > 2 then
+			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase) -- should be a level parameter
+		elseif #self.enemies == 2 then
+			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+2)
+		elseif #self.enemies == 1 then
+			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+8)
+		end	
 	end
 
 	if message_id == hash("enemy_bullet_destroyed") then
+		game_info.score = game_info.score+message.points
 		self.enemy_bullet_counter=self.enemy_bullet_counter-1
 		local i=1
 		for key, val in pairs(self.enemy_bullets) do
@@ -154,8 +155,7 @@ function on_message(self, message_id, message, sender)
 				table.remove(self.enemy_bullets,i)
 			end
 			i = i+1
-		end	
-		
+		end			
 	end
 	
 	if message_id == hash("player_bullets_changed") then
@@ -225,11 +225,11 @@ function unfreeze_enemies(self)
 end
 
 function move_enemies_down(self,dir)
-	for key, val in pairs(self.enemies) do
-		go.set(msg.url(msg.url().socket,val,"enemy"), "dir", dir)
+	for key, val in pairs(self.enemies) do		
 		local pos=go.get_position(val)
 		pos.y = pos.y - levels[game_info.level].vertical_speed
 		go.set_position(pos,val)
+		go.set(msg.url(msg.url().socket,val,"enemy"), "dir", dir)
 	end
 end
 
@@ -277,7 +277,7 @@ end
 function spawn_enemies(self)
 	local ret={}
 	local step_x=common_vars.screen_width/8
-	local start_y=common_vars.screen_height-390
+	local start_y=common_vars.screen_height-100
 	local step_y=44
 	for i = 1,levels[game_info.level].columns do
 		for n = 1,levels[game_info.level].rows do

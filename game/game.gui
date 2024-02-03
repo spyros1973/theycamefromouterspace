@@ -320,7 +320,7 @@ nodes {
   clipping_mode: CLIPPING_MODE_NONE
   clipping_visible: true
   clipping_inverted: false
-  alpha: 1.0
+  alpha: 0.8
   template_node_child: false
   size_mode: SIZE_MODE_MANUAL
   custom_type: 0
@@ -383,7 +383,7 @@ nodes {
   line_break: false
   parent: "panel_pause"
   layer: ""
-  inherit_alpha: true
+  inherit_alpha: false
   alpha: 1.0
   outline_alpha: 1.0
   shadow_alpha: 1.0
@@ -436,7 +436,7 @@ nodes {
   adjust_mode: ADJUST_MODE_FIT
   parent: "panel_pause"
   layer: ""
-  inherit_alpha: true
+  inherit_alpha: false
   slice9 {
     x: 8.0
     y: 8.0
@@ -562,7 +562,7 @@ nodes {
   adjust_mode: ADJUST_MODE_FIT
   parent: "panel_pause"
   layer: ""
-  inherit_alpha: true
+  inherit_alpha: false
   slice9 {
     x: 8.0
     y: 8.0

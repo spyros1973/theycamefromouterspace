@@ -1,6 +1,14 @@
 local common_vars = require("common")
 local game_info = require("game/game_info")
 
+local MSG_BULLET_DESTROYED = hash("bullet_destroyed")
+local MSG_GO_LEFT = hash("go_left")
+local MSG_GO_RIGHT = hash("go_right")
+local MSG_FIRE = hash("fire")
+local MSG_BONUS = hash("bonus")
+local MSG_REMOVE_BULLETS = hash("remove_bullets")
+local MSG_TRIGGER_RESPONSE = hash("trigger_response")
+
 go.property("speed",3)
 --go.property("max_bullets_on_screen",1)
 
@@ -83,7 +91,7 @@ function on_input(self, action_id, action)
 end
 
 function on_message(self, message_id, message, sender)	
-	if message_id==hash("bullet_destroyed") then
+	if message_id == MSG_BULLET_DESTROYED then
 		print("bullet destroyed")
 		self.bullets_on_screen = self.bullets_on_screen - 1
 		for i,v in ipairs(self.bullets) do
@@ -93,17 +101,17 @@ function on_message(self, message_id, message, sender)
 		end
 		msg.post("bullet_display", "update",{max_bullets=game_info.player_max_bullets,fired_bullets=self.bullets_on_screen})
 	end
-	if message_id==hash("go_left") then
+	if message_id == MSG_GO_LEFT  then
 		go_left(self)
 	end
-	if message_id==hash("go_right") then
+	if message_id == MSG_GO_RIGHT then
 		go_right(self)
 	end
-	if message_id==hash("fire") then
+	if message_id == MSG_FIRE then
 		fire_bullet(self)
 	end
 	
-	if message_id==hash("trigger_response") and message.enter then
+	if message_id == MSG_TRIGGER_RESPONSE and message.enter then
 		--if object is bullet
 		--msg.post("#collisionobject", "disable")
 		if message.other_group==hash("enemy") then
@@ -112,12 +120,12 @@ function on_message(self, message_id, message, sender)
 			particlefx.play("#explosion_big")
 			local trg_x=common_vars.screen_width+128
 			if math.random(6)>3 then 
-				trg=-128
+				trg_x=-128
 			end
-			go.animate(".", "scale.x", go.PLAYBACK_ONCE_FORWARD, 4, go.EASING_LINEAR, 0.8,0)
-			go.animate(".", "scale.y", go.PLAYBACK_ONCE_FORWARD, 4, go.EASING_LINEAR, 0.8,0)
+			go.animate(".", "scale.x", go.PLAYBACK_ONCE_FORWARD, 6, go.EASING_LINEAR, 0.8,0)
+			go.animate(".", "scale.y", go.PLAYBACK_ONCE_FORWARD, 6, go.EASING_LINEAR, 0.8,0)
 			go.animate(".", "rotation.z", go.PLAYBACK_ONCE_FORWARD, 0.8, go.EASING_LINEAR, 0.8,0)
-			go.animate(".", "position.y", go.PLAYBACK_ONCE_FORWARD, 100, go.EASING_LINEAR, 0.8,0)
+			go.animate(".", "position.y", go.PLAYBACK_ONCE_FORWARD, 320, go.EASING_LINEAR, 0.8,0)
 			go.animate(".", "position.x", go.PLAYBACK_ONCE_FORWARD, trg_x, go.EASING_LINEAR, 0.8,0,function ()
 				msg.post("/manager", "game_over")
 			end)
@@ -135,7 +143,7 @@ function on_message(self, message_id, message, sender)
 			msg.post("/manager", "player_hit")
 		end
 		
-		if message.other_group==hash("bonus") then
+		if message.other_group == MSG_BONUS then
 			--go.set( msg.url(msg.url().socket,enemy,"enemy"), "speed", levels[self.level].horizontal_speed)
 			if go.get(msg.url(msg.url().socket,message.other_id,"bonus"), "bonus_type")==hash("missile") then
 				print "got missile"				
@@ -148,12 +156,11 @@ function on_message(self, message_id, message, sender)
 			end	
 		end		
 	end
-	if message_id == hash("remove_bullets") then
+	if message_id == MSG_REMOVE_BULLETS then
 		for k,v in pairs(self.bullets) do
 			go.delete(v)
 		end
 		self.bullets_on_screen=0
 		msg.post("bullet_display", "update",{max_bullets=game_info.player_max_bullets,fired_bullets=self.bullets_on_screen})
-	end
-	
+	end	
 end

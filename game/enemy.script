@@ -11,7 +11,7 @@ end
 
 function on_message(self, message_id, message, sender)	
 	if message_id==hash("trigger_response") and message.enter and not self.isHit then
-		msg.post(self.parent, "enemy_destroyed")
+		msg.post(self.parent, "enemy_destroyed",{points=15})
 		msg.post("#collisionobject", "disable")
 		self.is_alive=false
 		sprite.play_flipbook ("#sprite","enemy1_explosion",function()
@@ -50,10 +50,12 @@ function update( self, dt)
 	pos.x=pos.x + self.dir * self.speed * dt
 	go.set_position(pos)
 	if pos.x>vars.screen_width-8 then
+		print("enemy reached edge at pos"..tostring(pos.x))
 		msg.post(self.parent, "edge_reached",{edge="right"})
 	end
 
 	if pos.x<8 then
+		print("enemy reached edge at pos"..tostring(pos.x))
 		msg.post(self.parent, "edge_reached",{edge="left"})
 	end	
 end

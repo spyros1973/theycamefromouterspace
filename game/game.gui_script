@@ -190,7 +190,7 @@ function on_message(self, message_id, message, sender)
 			self.is_game_over=true
 			self.game_over_key_timer=2
 			local acc = 0
-			local acc_text= "0%"
+			local acc_text= "Accuracy: 00%"
 			--set self.bonus points to add in score (animation on update)
 			if game_info.shots_fired>0 then 
 				acc=game_info.shots_hit*100/game_info.shots_fired 

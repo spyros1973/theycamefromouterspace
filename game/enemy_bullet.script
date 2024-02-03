@@ -14,7 +14,7 @@ end
 function update(self, dt)
 	local pos=go.get_position()
 	if pos.y<-10 then		
-		msg.post(self.manager, "enemy_bullet_destroyed")
+		msg.post(self.manager, "enemy_bullet_destroyed",{points=0})
 		go.delete()
 		return
 	end
@@ -30,7 +30,9 @@ function on_message(self, message_id, message, sender)
 	if message_id==hash("trigger_response") and message.enter then
 		msg.post("#collisionobject", "disable")
 		self.is_alive=false
-		msg.post(self.manager, "enemy_bullet_destroyed")
+		local pts=0
+		if message.other_group==hash("bullet") then pts=5 end
+		msg.post(self.manager, "enemy_bullet_destroyed",{points=pts})
 		sprite.play_flipbook ("#sprite","enemy1_explosion",function()
 			go.delete() 
 		end)	

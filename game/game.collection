@@ -19,6 +19,66 @@ instances {
     z: 1.0
   }
 }
+collection_instances {
+  id: "wall0"
+  collection: "/game/wall.collection"
+  position {
+    x: 34.0
+    y: 180.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 0.8
+    y: 0.8
+    z: 1.0
+  }
+}
+collection_instances {
+  id: "wall1"
+  collection: "/game/wall.collection"
+  position {
+    x: 125.0
+    y: 180.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 0.8
+    y: 0.8
+    z: 1.0
+  }
+}
+collection_instances {
+  id: "wall2"
+  collection: "/game/wall.collection"
+  position {
+    x: 218.0
+    y: 180.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 0.8
+    y: 0.8
+    z: 1.0
+  }
+}
 scale_along_z: 0
 embedded_instances {
   id: "player"
