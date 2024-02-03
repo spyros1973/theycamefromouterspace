@@ -42,6 +42,8 @@ function init(self)
 		gui.set_enabled(gui.get_node("panel_controls"), false)	
 		gui.set_visible(gui.get_node("panel_controls"), false)		
 	end
+
+	
 end
 
 function final(self)

@@ -38,7 +38,7 @@ end
 
 function start_game(self)
 	game_info.reset()
-	game_info.level = 3
+	game_info.level = 1
 	start_level(self)
 end
 

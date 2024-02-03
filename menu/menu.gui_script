@@ -3,6 +3,7 @@ local high_score = require("highscore")
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
+	gui.set_scale(gui.get_node("title"), vmath.vector3(0.1,0.1,1))
 	local info=sys.get_sys_info()
 	gui.set_text(gui.get_node("info"), "Platform: "..common_vars.device_type)
 	local hi=high_score.load()
@@ -14,7 +15,9 @@ function init(self)
 		gui.set_enabled(gui.get_node("text_play"), true)
 		gui.set_enabled(gui.get_node("btn_play"), false)	
 	end
-
+	gui.animate(gui.get_node("title"), "scale.x", 1, gui.EASING_IN, 0.7, 0)
+	gui.animate(gui.get_node("title"), "scale.y", 1, gui.EASING_IN, 0.7, 0)
+	
 	--gui.set_position(gui.get_node("title"),vmath.vector3(common_vars.screen_width/2,common_vars.screen_height-40,0))
 end
 
