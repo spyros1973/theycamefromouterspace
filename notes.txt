@@ -1,5 +1,18 @@
 Notes
 =====
+
+Todo:
+Troubleshoot edge reaching bug
+Some animation when bullets are removed from screen - cases are for enemy bullets (in manager) and player bullets (in player)
+Better mobile controls
+Implement bonus types: extra life, speed
+Smarter enemy shooting
+Sound support
+Settings screen (enable / disable sound)
+Add more levels to reach 10 in total
+
+
+Done:
 on-screen controls on mobile only (ok)
 pre-game countdown (ok)
 lives as graphics (ok)
@@ -20,42 +33,20 @@ To clear all bullets, manager must know about them!!! (ok)
 When a life is lost, reduce no of bullets on screen if over 1 (ok)
 Show level in pregame screen or in hud (ok)
 Show number of bullets on screen in hud? (ok)
-
-Some animation when bullets are remove from screen - cases are for enemy bullets (in manager) and player bullets (in player)
-
-Better mobile controls
+Add to Github (ok)
 Different way of showing max player bullets (ok)
-Implement bonus types: extra life, speed
 Enemy fire rate should be level property (ok)
-Give points when shooting enemy bullets
-Add wall support
+Give points when shooting enemy bullets (ok)
+Add wall support (ok)
 
-sound
 
-settings
-
-levels
-
-more bonuses
-
-walls !!!
-
-complete
-
+Notes:
 21/9 is 2560×1080
 1280x540
-640x270
+640x270 - choosen resolution
 
-
-github
-
-forum writeup
-
-detect mobile:
-local device = require("device")
-if device.type == "mobile" then
-    -- do something!
-end
+Document experience to Defold forum
+- Trigger collisions: many times not firing, because I forgot to set masks to both colliding objects
 
 Planet sprite:
 Master484  (http://m484games.ucoz.com/)
