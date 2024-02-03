@@ -48,15 +48,14 @@ function update( self, dt)
 	if self.is_frozen then return end
 	local pos=go.get_position()
 	pos.x=pos.x + self.dir * self.speed * dt
+	go.set_position(pos)
 	if pos.x>vars.screen_width-8 then
 		msg.post(self.parent, "edge_reached",{edge="right"})
 	end
 
 	if pos.x<8 then
 		msg.post(self.parent, "edge_reached",{edge="left"})
-	end
-
-	go.set_position(pos)
+	end	
 end
 
 if message_id==hash("freeze") then

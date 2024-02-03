@@ -24,7 +24,7 @@ Show number of bullets on screen in hud? (ok)
 Some animation when bullets are remove from screen - cases are for enemy bullets (in manager) and player bullets (in player)
 
 Better mobile controls
-Different way of showing max player bullets
+Different way of showing max player bullets (ok)
 Implement bonus types: extra life, speed
 Enemy fire rate should be level property (ok)
 Give points when shooting enemy bullets

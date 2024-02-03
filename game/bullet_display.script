@@ -1,0 +1,23 @@
+function init(self)
+	-- Add initialization code here
+	-- Learn more: https://defold.com/manuals/script/
+	-- Remove this function if not needed
+end
+
+
+function on_message(self, message_id, message, sender)
+-- receive message with max bullets, bullets available and display accordingly
+	if message_id == hash("update") then
+		for i = 1, 5 do
+			if i > message.max_bullets - message.fired_bullets then
+				msg.post("#bullet_"..tostring(i), "disable")
+			else
+				msg.post("#bullet_"..tostring(i), "enable")
+			end
+		end
+		
+	end
+	-- Add message-handling code here
+	-- Learn more: https://defold.com/manuals/message-passing/
+	-- Remove this function if not needed
+end
