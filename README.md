@@ -3,6 +3,7 @@
 Space Invaders inspired game - Test project to learn Defold and Lua
 
 ---
+Credits:
 
 Planet sprite:
 Master484  (http://m484games.ucoz.com/)
