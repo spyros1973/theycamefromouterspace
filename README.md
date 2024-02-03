@@ -2,7 +2,7 @@
 
 Space Invaders inspired game - test project to learn Defold and Lua
 
-![image](https://github.com/spyros1973/theycamefromouterspace/assets/1493552/aa6c3cb3-b543-41e0-a5c7-4307f6047dd5)
+![image](https://github.com/spyros1973/theycamefromouterspace/assets/1493552/181b7f15-ad01-41c8-93b5-91d7d7435c94)
 
 ---
 ### Credits:
