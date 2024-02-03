@@ -1,5 +1,6 @@
 [bootstrap]
 main_collection = /startup.collectionc
+render = /builtins/render/default.renderc
 
 [script]
 shared_state = 1
@@ -15,7 +16,7 @@ package = gr.paraschis.invaders
 app_icon_192x192 = /assets/GameIcon_192.png
 
 [project]
-title = Invaders
+title = They came from outer space
 developer = Spyros Paraschis
 
 [graphics]
