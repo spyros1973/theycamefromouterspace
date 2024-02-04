@@ -76,7 +76,10 @@ function update(self, dt)
 	self.enemy_bullet_timer = self.enemy_bullet_timer + dt
 	if self.enemy_bullet_timer > levels[game_info.level].enemy_fire_frequency+math.random(3)/2 then --add random element
 		self.enemy_bullet_timer=0
-		fire_enemy_bullet(self)
+		if  #self.enemies<4 or (#self.enemies<10 and math.random(4)>2) then 
+			fire_enemy_bullet_at_player(self)
+		end
+		fire_enemy_bullet(self)				
 	end
 end
 
@@ -207,7 +210,7 @@ function on_message(self, message_id, message, sender)
 	
 	if message_id == MSG_EDGE_REACHED and self.edge_reached_timer == 0 then
 		print("edge reached called")
-		self.edge_reached_timer = 2
+		self.edge_reached_timer = 3
 		local dir = 1
 		if message.edge == "right" then dir = -1 end
 		move_enemies_down(self,dir)
@@ -253,15 +256,18 @@ end
 function fire_enemy_bullet(self)
 	--locate bottom row, should be second to bottom, like the original
 	local lowest_y=5000	
+	local second_lowest_y=5000
 	for key, val in pairs(self.enemies) do
 		local pos=go.get_position(msg.url(msg.url().socket,val,"enemy"))
 		lowest_y=math.min(pos.y, lowest_y)
+		second_lowest_y=math.max(lowest_y, second_lowest_y)
 	end
 	if lowest_y == 5000 then return end
+	if second_lowest_y == 5000 then second_lowest_y = lowest_y end
 	local bottom_aliens={}
 	for key, val in pairs(self.enemies) do
 		local pos=go.get_position(msg.url(msg.url().socket,val,"enemy"))
-		if pos.y == lowest_y then
+		if pos.y == second_lowest_y then
 			table.insert(bottom_aliens, val)
 		end
 	end
@@ -275,6 +281,23 @@ function fire_enemy_bullet(self)
 	table.insert(self.enemy_bullets, bullet)
 	self.enemy_bullet_counter=self.enemy_bullet_counter+1
 end
+
+function fire_enemy_bullet_at_player(self)
+	local player_pos=go.get_position(self.player)
+	
+	for key, val in pairs(self.enemies) do
+		local pos=go.get_position(msg.url(msg.url().socket,val,"enemy"))
+		if pos.x>player_pos.x-8 and pos.x<player_pos.x+8 then
+			local bullet=factory.create("#enemy_bullet_factory",pos)		
+			msg.post(bullet, "subscribe",  { parent_url = msg.url() })
+			go.set(msg.url(msg.url().socket,bullet,"enemy_bullet"), "speed", levels[game_info.level].enemy_bullet_speed)
+			table.insert(self.enemy_bullets, bullet)
+			self.enemy_bullet_counter=self.enemy_bullet_counter+1
+			break
+		end		
+	end
+end
+
 
 function spawn_ufo(self)
 	local pos=vmath.vector3(-60,common_vars.screen_height-100,0)
