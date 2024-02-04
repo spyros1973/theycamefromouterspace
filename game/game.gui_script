@@ -36,6 +36,7 @@ function init(self)
 	self.game_over_key_timer=2
 	self.countdown_counter=4
 	self.show_countdown=false
+	self.game_won=false
 	
 	gui.set_visible(gui.get_node("txt_new_high"), false)	
 	if not common_vars.is_mobile then
@@ -91,7 +92,12 @@ function on_input(self, action_id, action)
 	if action_id == hash("touch") then print "touch!" end
 	if self.is_game_over and self.game_over_key_timer<=0 then		
 		if (action_id == hash("touch") or action_id==hash("escape") or action_id==hash("fire")) and action.released then
-			msg.post("/manager#manager", "abort")
+			if self.game_won then 
+				msg.post("startup:/handler#startup", "show_gamewon")
+			else
+				msg.post("/manager#manager", "abort")
+			end
+			
 		end
 	end
 	
@@ -191,6 +197,7 @@ function on_message(self, message_id, message, sender)
 		if message.state == true then 
 			self.is_game_over=true
 			self.game_over_key_timer=2
+			self.game_won=message.game_won
 			local acc = 0
 			local acc_text= "Accuracy: 00%"
 			--set self.bonus points to add in score (animation on update)

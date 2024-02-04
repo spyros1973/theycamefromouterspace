@@ -11,8 +11,11 @@ Smarter enemy shooting:
 Sound support
 Settings screen (enable / disable sound)
 Add more levels to reach 10 in total
+Add accuracy bonus with animation on game over screen
+
 
 Done:
+Add game won screen
 Troubleshoot edge reaching bug (ok... maybe)
 on-screen controls on mobile only (ok)
 pre-game countdown (ok)

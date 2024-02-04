@@ -1,0 +1,8 @@
+function init(self)
+	go.animate("earth", "position.x", go.PLAYBACK_ONCE_FORWARD, 40, go.EASING_INCUBIC, 4)
+	go.animate("earth", "position.y", go.PLAYBACK_ONCE_FORWARD, 80, go.EASING_INCUBIC, 4)
+	--go.animate("earth", "scale.x", go.PLAYBACK_ONCE_FORWARD, 1.5, go.EASING_INCUBIC, 4)
+	--go.animate("earth", "scale.y", go.PLAYBACK_ONCE_FORWARD, 1.5, go.EASING_INCUBIC, 4)
+	go.animate("alien", "position", go.PLAYBACK_ONCE_FORWARD, vmath.vector3(180,80,0), go.EASING_INCUBIC, 4,4.5)
+end
+

@@ -1,12 +1,13 @@
-function init(self)	
+function init(self)
+	self.controller_states={menu=true,game=false,gamewon=false}
 	msg.post("@render:", "use_stretch_projection", { near = -1, far = 1 })
 	--msg.post("@render:", "use_fixed_fit_projection", { near = -1, far = 1 })
 	--msg.post("@render:", "use_fixed_projection", { near = -1, far = 1, zoom = 2 })
 	math.randomseed(os.time())
 	math.random();math.random();math.random(); -- discard first few random numbers
 	print("startup url: "..msg.url())
-	--msg.post(".", "show_menu")
 	msg.post("handler#menu", "load")
+	--msg.post("handler#gamewon", "load")
 	msg.post(".", "acquire_input_focus")
 end
 
@@ -24,11 +25,20 @@ end
 
 function on_message(self, message_id, message, sender)
 	if(message_id == hash("show_game")) then
-		msg.post("handler#menu", "unload")
+		if self.controller_states["menu"] then msg.post("handler#menu", "unload") end
+		if self.controller_states["gamewon"] then msg.post("handler#gamewon", "unload") end
+		self.controller_states["game"]=true
 		msg.post("handler#game", "load")
 	elseif(message_id == hash("show_menu")) then
-		msg.post("handler#game", "unload")	
+		if self.controller_states["game"] then msg.post("handler#game", "unload") end
+		if self.controller_states["gamewon"] then msg.post("handler#gamewon", "unload") end
+		self.controller_states["menu"]=true
 		msg.post("handler#menu", "load")
+	elseif(message_id == hash("show_gamewon")) then
+		if self.controller_states["game"] then msg.post("handler#game", "unload") end
+		if self.controller_states["menu"] then msg.post("handler#menu", "unload") end
+		self.controller_states["gamewon"]=true
+		msg.post("handler#gamewon", "load")	
 	elseif message_id == hash("proxy_loaded") then	
 		msg.post(sender, "enable")	
 	end

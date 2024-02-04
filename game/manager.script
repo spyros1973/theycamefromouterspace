@@ -39,7 +39,7 @@ function start_level(self)
 	msg.post("#game", "update_lives",{lives = game_info.lives})	
 	--msg.post("player/bullet_display", "update",{max_bullets=game_info.player_max_bullets,fired_bullets=self.bullets_on_screen})
 	msg.post("#game", "pause",{state = false})	
-	msg.post("#game", "game_over",{state = false})	
+	msg.post("#game", "game_over",{state = false, game_won = false})	
 	msg.post("#game", "countdown")
 	msg.post("startup:/handler#game", "set_time_step", {factor = 0, mode = 1})		
 	--spawn_ufo(self) --for testing
@@ -47,7 +47,7 @@ end
 
 function start_game(self)
 	game_info.reset()
-	game_info.level = 3
+	game_info.level = 1
 	start_level(self)
 end
 
@@ -137,8 +137,8 @@ function on_message(self, message_id, message, sender)
 			timer.delay(1, false, function()
 				
 				if game_info.level == #levels then
-					--show show won screen/message
-					msg.post("startup:/handler#startup", "show_menu")
+					msg.post(".", "game_over",{won=true})
+					--msg.post("startup:/handler#startup", "show_gamewon")
 				else
 					game_info.level = game_info.level+1
 					msg.post(self.player, "remove_bullets")
@@ -177,24 +177,22 @@ function on_message(self, message_id, message, sender)
 		msg.post("#game", "update_lives",{lives = game_info.lives})	
 		if game_info.lives == 0 then
 			timer.delay(1, false, function()
-				msg.post(".", "game_over")
+				msg.post(".", "game_over",{won=false})
 			end)			
 		end
 		freeze_enemies(self)
 	end
 		
 	if message_id == MSG_GAME_OVER then
-		print("Game over")
-		print("Shots: "..tostring(game_info.shots_hit).." / "..tostring(game_info.shots_fired))
+		--print("Game over")
+		--print("Shots: "..tostring(game_info.shots_hit).." / "..tostring(game_info.shots_fired))
 		game_info.mode="gameover"
-		--self.state="gameover"
 		msg.post("startup:/handler#game", "set_time_step", {factor = 0, mode = 1})	
-		msg.post("#game", "game_over",{state = true})
+		msg.post("#game", "game_over",{state = true, game_won = message.won})
 		local hi=high_score.load()
 		if game_info.score>hi then
 			high_score.save(game_info.score)
 			msg.post("#game", "new_high")
-			-- a message would be nice
 		end		
 	end
 

@@ -10,17 +10,6 @@ animations {
   flip_vertical: 0
 }
 animations {
-  id: "bullet"
-  images {
-    image: "/assets/bullet.png"
-    sprite_trim_mode: SPRITE_TRIM_MODE_OFF
-  }
-  playback: PLAYBACK_LOOP_FORWARD
-  fps: 60
-  flip_horizontal: 0
-  flip_vertical: 0
-}
-animations {
   id: "enemy1"
   images {
     image: "/assets/enemy1-1.png"
@@ -200,6 +189,17 @@ animations {
   id: "wall"
   images {
     image: "/assets/wall_part.png"
+    sprite_trim_mode: SPRITE_TRIM_MODE_OFF
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 60
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "terran"
+  images {
+    image: "/assets/terran.png"
     sprite_trim_mode: SPRITE_TRIM_MODE_OFF
   }
   playback: PLAYBACK_LOOP_FORWARD
