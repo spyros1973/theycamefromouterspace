@@ -7,7 +7,16 @@ local MSG_COUNTDOWN_ENDED = hash("countdown_ended")
 local MSG_PLAYER_SUBSCRIBE = hash("player_subscribe")
 local MSG_PLAYER_MOVE_LEFT = hash("player_move_left") 
 local MSG_PLAYER_MOVE_RIGHT = hash("player_move_right") 
-local MSG_PLAYER_FILE = hash("player_fire")
+local MSG_PLAYER_FIRE = hash("player_fire")
+local MSG_ENEMY_BULLET_DESTROYED = hash("enemy_bullet_destroyed") 
+local MSG_PAUSE = hash("pause") 
+local MSG_UFO_DESTROYED = hash("ufo_destroyed")
+local MSG_ENEMY_DESTROYED = hash("enemy_destroyed")
+local MSG_PLAYER_HIT  = hash("player_hit")
+local MSG_GAME_OVER = hash("game_over") 
+local MSG_ABORT = hash("abort")
+local MSG_PLAYER_READY = hash("player_ready")
+local MSG_EDGE_REACHED = hash("edge_reached")
 
 local function my_error_handler(source, message, traceback)
 	print(source)    --> lua
@@ -38,7 +47,7 @@ end
 
 function start_game(self)
 	game_info.reset()
-	game_info.level = 1
+	game_info.level = 3
 	start_level(self)
 end
 
@@ -85,40 +94,40 @@ function on_message(self, message_id, message, sender)
 	if message_id == MSG_PLAYER_MOVE_LEFT then
 		msg.post(self.player, "go_left")
 	end
-	if message_id == NSG_PLAYER_MOVE_RIGHT  then
+	if message_id == MSG_PLAYER_MOVE_RIGHT  then
 		msg.post(self.player, "go_right")
 	end
-	if message_id == MSG_PLAYER_FILE then
+	if message_id == MSG_PLAYER_FIRE then
 		msg.post(self.player, "fire")
 	end
 	
-	if message_id==hash("pause") then
+	if message_id == MSG_PAUSE then
 		if game_info.mode == "pause" then game_info.mode = "play" else game_info.mode = "pause" end
 		local factor = (game_info.mode == "pause") and 0 or 1
 		msg.post("startup:/handler#game", "set_time_step", {factor = factor, mode = 1})
 		msg.post("#game", "pause",{state = (game_info.mode == "pause")})
 	end
 	
-	if message_id == hash("ufo_destroyed") then
+	if message_id == MSG_UFO_DESTROYED  then
 		game_info.score = game_info.score+50
 		game_info.shots_hit = game_info.shots_hit+1
 		msg.post("#game", "update_score",{score = game_info.score})	
 	end
 	
-	if message_id == hash("enemy_destroyed") then
+	if message_id == MSG_ENEMY_DESTROYED then
 		game_info.shots_hit = game_info.shots_hit+1
-		local idxToRemove
+		local idxToRemove=0
 		for i = 1, #self.enemies do
 			if (self.enemies[i] == sender.path) then
 				idxToRemove = i
 				break
 			end
 		end
-		if idxToRemove then
-			--print ("removed "..tostring(idxToRemove))
+		if idxToRemove>0 then
+			print ("removed "..tostring(idxToRemove))
 			table.remove(self.enemies, idxToRemove)
-		end
-		print ("Enemy destroyed - remaining "..tostring(#self.enemies))
+			print ("Enemy destroyed - remaining "..tostring(#self.enemies))
+		end		
 		
 		game_info.score = game_info.score+message.points
 		msg.post("#game", "update_score",{score = game_info.score})
@@ -138,7 +147,7 @@ function on_message(self, message_id, message, sender)
 				end
 			end)			
 		elseif #self.enemies > 2 then
-			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase) -- should be a level parameter
+			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase/2) -- should be a level parameter
 		elseif #self.enemies == 2 then
 			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+2)
 		elseif #self.enemies == 1 then
@@ -146,7 +155,7 @@ function on_message(self, message_id, message, sender)
 		end	
 	end
 
-	if message_id == hash("enemy_bullet_destroyed") then
+	if message_id == MSG_ENEMY_BULLET_DESTROYED then
 		game_info.score = game_info.score+message.points
 		self.enemy_bullet_counter=self.enemy_bullet_counter-1
 		local i=1
@@ -158,11 +167,12 @@ function on_message(self, message_id, message, sender)
 		end			
 	end
 	
+	--never called
 	if message_id == hash("player_bullets_changed") then
 		msg.post("#game", "update_bullets",{bullets=game_info.player_max_bullets})
 	end
-	
-	if message_id == hash("player_hit") then
+
+	if message_id == MSG_PLAYER_HIT   then
 		game_info.lives = game_info.lives-1
 		msg.post("#game", "update_lives",{lives = game_info.lives})	
 		if game_info.lives == 0 then
@@ -173,7 +183,7 @@ function on_message(self, message_id, message, sender)
 		freeze_enemies(self)
 	end
 		
-	if message_id == hash("game_over") then
+	if message_id == MSG_GAME_OVER then
 		print("Game over")
 		print("Shots: "..tostring(game_info.shots_hit).." / "..tostring(game_info.shots_fired))
 		game_info.mode="gameover"
@@ -188,17 +198,17 @@ function on_message(self, message_id, message, sender)
 		end		
 	end
 
-	if message_id == hash("abort") then
+	if message_id == MSG_ABORT  then
 		print ("manager received abort message")
 		msg.post("startup:/handler#startup", "show_menu")
 	end
 
-	if message_id == hash("player_ready") then
+	if message_id == MSG_PLAYER_READY  then
 		unfreeze_enemies(self)
 	end
 	
-	if message_id == hash("edge_reached") and self.edge_reached_timer == 0 then
-		--fire_enemy_bullet(self) --for testing, should be determined by a counter that decreases as fewer enemies remain
+	if message_id == MSG_EDGE_REACHED and self.edge_reached_timer == 0 then
+		print("edge reached called")
 		self.edge_reached_timer = 2
 		local dir = 1
 		if message.edge == "right" then dir = -1 end
@@ -234,6 +244,7 @@ function move_enemies_down(self,dir)
 end
 
 function make_enemies_faster(self,increment)
+	print("requested enemy speed increase "..tostring(increment))
 	for key, val in pairs(self.enemies) do
 		local speed=go.get(msg.url(msg.url().socket,val,"enemy"), "speed")
 		speed = speed + increment

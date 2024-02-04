@@ -2,17 +2,18 @@ Notes
 =====
 
 Todo:
-Troubleshoot edge reaching bug
 Some animation when bullets are removed from screen - cases are for enemy bullets (in manager) and player bullets (in player)
 Better mobile controls
 Implement bonus types: extra life, speed
-Smarter enemy shooting
+Smarter enemy shooting:
+  a) if player is on same x as enemy, shoot
+  b) if enemy is slightly to the left and another to the right of the player, shoot
 Sound support
 Settings screen (enable / disable sound)
 Add more levels to reach 10 in total
 
-
 Done:
+Troubleshoot edge reaching bug (ok... maybe)
 on-screen controls on mobile only (ok)
 pre-game countdown (ok)
 lives as graphics (ok)
