@@ -33,7 +33,7 @@ function on_message(self, message_id, message, sender)
 		local pts=0
 		if message.other_group==hash("bullet") then 
 			pts=5 
-			msg.post("/sound_manager", "play_sample",{sample="explosion1"}) -- use other sample
+			msg.post("/sound_manager", "play_sample",{sample="hit2"}) -- use other sample
 		end
 		msg.post(self.manager, "enemy_bullet_destroyed",{points=pts})
 		sprite.play_flipbook ("#sprite","enemy1_explosion",function()

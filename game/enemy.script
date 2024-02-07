@@ -47,21 +47,19 @@ end
 function update( self, dt)
 	if not self.is_alive then return end
 	if self.is_frozen then return end
-	local pos=go.get_position()
+	local pos=go.get_position()	
 	pos.x=pos.x + self.dir * self.speed * dt
 	go.set_position(pos)
 	if pos.x>vars.screen_width-8 then
 		print("enemy reached edge at pos "..tostring(pos.x).." speed, dir= "..tostring(self.speed)..", "..tostring(self.dir))
 		msg.post(self.parent, "edge_reached",{edge="right"})
-	end
-
-	if pos.x<8 then
+	elseif pos.x<8 then
 		print("enemy reached edge at pos "..tostring(pos.x).." speed, dir= "..tostring(self.speed)..", "..tostring(self.dir))
 		msg.post(self.parent, "edge_reached",{edge="left"})
-	end	
-
-	if pos.y<40 then
+	elseif pos.y<40 then
 		msg.post(self.parent, "game_over")
+	else
+
 	end
 end
 
