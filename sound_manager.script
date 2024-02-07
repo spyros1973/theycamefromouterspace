@@ -1,0 +1,20 @@
+local settings = require("settings")
+
+local MSG_PLAY_SAMPLE = hash("play_sample")
+
+function init(self)
+	settings.load()
+	--play_sound=settings.play_sound
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Learn more: https://defold.com/manuals/script/
+	-- Remove this function if not needed
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == MSG_PLAY_SAMPLE and settings.play_sound then
+		sound.play("#"..message.sample)
+	end	
+end

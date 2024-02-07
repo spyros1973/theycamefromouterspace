@@ -13,8 +13,8 @@ Settings screen (enable / disable sound)
 Add more levels to reach 10 in total
 Add accuracy bonus with animation on game over screen
 
-
 Done:
+Enemies should not be destroyed when colliding with wall (ok)
 Add game won screen
 Troubleshoot edge reaching bug (ok... maybe)
 on-screen controls on mobile only (ok)
@@ -51,6 +51,8 @@ Notes:
 
 Document experience to Defold forum
 - Trigger collisions: many times not firing, because I forgot to set masks to both colliding objects
+- Implementing a pause feature is more complicated than expected (you need a collection proxy, you need to dispatch a set_time_step message, you need to separately handle logic not covered by time step)
+
 
 Planet sprite:
 Master484  (http://m484games.ucoz.com/)
@@ -61,7 +63,13 @@ OPTIONAL: Credit "Anton Revin"
 Graphics:
 Comp-3 Interactive (https://comp3interactive.itch.io/invaders-from-outerspace-full-project-asset-pack)
 
+Sound effects:
+Laser sounds - Muncheybobo 
+Explosions - Jesús Lastra
+Misc - artisticdude
 
+Music:
+HydroGene
 
 
 

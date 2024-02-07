@@ -23,6 +23,7 @@ function fire_bullet(self)
 		table.insert(self.bullets, bullet)
 		msg.post(bullet, "subscribe",{parent_url=msg.url()})
 		msg.post("bullet_display", "update",{max_bullets=game_info.player_max_bullets,fired_bullets=self.bullets_on_screen})
+		msg.post("/sound_manager", "play_sample",{sample="fire1"})
 	end
 end	
 
@@ -126,6 +127,7 @@ function on_message(self, message_id, message, sender)
 			--game over?
 			game_info.lives=0
 			particlefx.play("#explosion_big")
+			msg.post("/sound_manager", "play_sample",{sample="explosion2"})
 			local trg_x=common_vars.screen_width+128
 			if math.random(6)>3 then 
 				trg_x=-128
@@ -139,7 +141,7 @@ function on_message(self, message_id, message, sender)
 			end)
 		end
 		if message.other_group==hash("enemy_bullet") and self.invincibility<=0 then
-			print("player hit")
+			msg.post("/sound_manager", "play_sample",{sample="explosion2"})
 			particlefx.play("#explosion_big")
 			go.animate(".", "position.y", go.PLAYBACK_ONCE_FORWARD, -116, go.EASING_LINEAR, 0.3,0,function ()
 				if game_info.lives > 0 then
@@ -156,6 +158,7 @@ function on_message(self, message_id, message, sender)
 			--go.set( msg.url(msg.url().socket,enemy,"enemy"), "speed", levels[self.level].horizontal_speed)
 			if go.get(msg.url(msg.url().socket,message.other_id,"bonus"), "bonus_type")==hash("missile") then
 				print "got missile"				
+				--msg.post("/sound_manager", "play_sample",{sample="bonus"})
 				go.animate("#sprite", "tint", go.PLAYBACK_ONCE_PINGPONG, vmath.vector4(0.2, 0.2, 0.2, 0.2), go.EASING_INOUTSINE, 0.5)
 				if game_info.player_max_bullets < 5 then 
 					game_info.player_max_bullets = game_info.player_max_bullets+1

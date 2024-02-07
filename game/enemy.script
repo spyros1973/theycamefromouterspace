@@ -10,10 +10,11 @@ function init(self)
 end
 
 function on_message(self, message_id, message, sender)	
-	if message_id==hash("trigger_response") and message.enter and self.is_alive then
+	if message_id==hash("trigger_response") and message.enter and self.is_alive and message.other_group~= hash("wall") then
 		msg.post("#collisionobject", "disable")
 		self.is_alive=false
-		msg.post(self.parent, "enemy_destroyed",{points=15})		
+		msg.post(self.parent, "enemy_destroyed",{points=15})
+		msg.post("/sound_manager", "play_sample",{sample="explosion1"})
 		sprite.play_flipbook ("#sprite","enemy1_explosion",function()
 			go.delete()
 		end)	

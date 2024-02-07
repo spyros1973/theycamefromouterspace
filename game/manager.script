@@ -69,7 +69,7 @@ function update(self, dt)
 	end
 
 	self.ufo_timer = self.ufo_timer - dt
-	if self.ufo_timer <= 0 then --add random element
+	if self.ufo_timer <= 0 then 
 		spawn_ufo(self)
 	end
 
@@ -236,6 +236,7 @@ function unfreeze_enemies(self)
 end
 
 function move_enemies_down(self,dir)
+	msg.post("/sound_manager", "play_sample",{sample="edge"})
 	for key, val in pairs(self.enemies) do		
 		local pos=go.get_position(val)
 		pos.y = pos.y - levels[game_info.level].vertical_speed
@@ -271,7 +272,8 @@ function fire_enemy_bullet(self)
 			table.insert(bottom_aliens, val)
 		end
 	end
-		
+
+	msg.post("/sound_manager", "play_sample",{sample="fire2"})
 	local shooter=math.random(1,#bottom_aliens)
 	local pos=go.get_position(msg.url(msg.url().socket,bottom_aliens[shooter],"enemy"))
 	--msg.post(msg.url(msg.url().socket,bottom_aliens[shooter],"enemy"), "fire",{speed=levels[game_info.level].enemy_bullet_speed})
@@ -288,6 +290,7 @@ function fire_enemy_bullet_at_player(self)
 	for key, val in pairs(self.enemies) do
 		local pos=go.get_position(msg.url(msg.url().socket,val,"enemy"))
 		if pos.x>player_pos.x-8 and pos.x<player_pos.x+8 then
+			msg.post("/sound_manager", "play_sample",{sample="fire2"})
 			local bullet=factory.create("#enemy_bullet_factory",pos)		
 			msg.post(bullet, "subscribe",  { parent_url = msg.url() })
 			go.set(msg.url(msg.url().socket,bullet,"enemy_bullet"), "speed", levels[game_info.level].enemy_bullet_speed)

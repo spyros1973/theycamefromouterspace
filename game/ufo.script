@@ -27,6 +27,7 @@ function on_message(self, message_id, message, sender)
 		msg.post(self.parent, "ufo_destroyed")
 		msg.post("#collisionobject", "disable")
 		self.is_alive=false
+		msg.post("/sound_manager", "play_sample",{sample="explosion2"})
 		factory.create("#bonus_factory",bullet_pos)
 		sprite.play_flipbook ("#sprite","enemy1_explosion",function()
 			go.delete()

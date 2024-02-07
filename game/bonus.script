@@ -11,7 +11,7 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id==hash("trigger_response") and message.enter then
-		--msg.post("/player#player", "bonus_destroyed")
+		--msg.post("/player#player", "bonus_destroyed")		
 		go.delete()
 		--particlefx.play("#explosion")
 	end

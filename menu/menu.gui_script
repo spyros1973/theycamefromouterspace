@@ -1,5 +1,5 @@
 local common_vars=require("common")
-local high_score = require("highscore")
+local high_score=require("highscore")
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
