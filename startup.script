@@ -25,18 +25,36 @@ end
 
 function on_message(self, message_id, message, sender)
 	if(message_id == hash("show_game")) then
-		if self.controller_states["menu"] then msg.post("handler#menu", "unload") end
-		if self.controller_states["gamewon"] then msg.post("handler#gamewon", "unload") end
+		if self.controller_states["menu"] then 
+			msg.post("handler#menu", "unload") 
+			self.controller_states["menu"]=false
+		end
+		if self.controller_states["gamewon"] then 
+			msg.post("handler#gamewon", "unload") 
+			self.controller_states["gamewon"]=false
+		end
 		self.controller_states["game"]=true
 		msg.post("handler#game", "load")
 	elseif(message_id == hash("show_menu")) then
-		if self.controller_states["game"] then msg.post("handler#game", "unload") end
-		if self.controller_states["gamewon"] then msg.post("handler#gamewon", "unload") end
+		if self.controller_states["game"] then 
+			msg.post("handler#game", "unload") 
+			self.controller_states["game"]=false
+		end
+		if self.controller_states["gamewon"] then 
+			msg.post("handler#gamewon", "unload") 
+			self.controller_states["gamewon"]=false
+		end
 		self.controller_states["menu"]=true
 		msg.post("handler#menu", "load")
 	elseif(message_id == hash("show_gamewon")) then
-		if self.controller_states["game"] then msg.post("handler#game", "unload") end
-		if self.controller_states["menu"] then msg.post("handler#menu", "unload") end
+		if self.controller_states["game"] then 
+			msg.post("handler#game", "unload") 
+			self.controller_states["game"]=false
+		end
+		if self.controller_states["menu"] then 
+			msg.post("handler#menu", "unload") 
+			self.controller_states["menu"]=false
+		end
 		self.controller_states["gamewon"]=true
 		msg.post("handler#gamewon", "load")	
 	elseif message_id == hash("proxy_loaded") then	

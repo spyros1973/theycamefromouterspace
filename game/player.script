@@ -158,7 +158,7 @@ function on_message(self, message_id, message, sender)
 			--go.set( msg.url(msg.url().socket,enemy,"enemy"), "speed", levels[self.level].horizontal_speed)
 			if go.get(msg.url(msg.url().socket,message.other_id,"bonus"), "bonus_type")==hash("missile") then
 				print "got missile"				
-				--msg.post("/sound_manager", "play_sample",{sample="bonus"})
+				msg.post("/sound_manager", "play_sample",{sample="pickup"})
 				go.animate("#sprite", "tint", go.PLAYBACK_ONCE_PINGPONG, vmath.vector4(0.2, 0.2, 0.2, 0.2), go.EASING_INOUTSINE, 0.5)
 				if game_info.player_max_bullets < 5 then 
 					game_info.player_max_bullets = game_info.player_max_bullets+1

@@ -1,0 +1,213 @@
+local common_vars = require("common")
+local levels = require("levels")
+local game_info = require("game/game_info")
+
+local MSG_START = hash("start_enemies")
+local MSG_ENEMY_BULLET_DESTROYED = hash("enemy_bullet_destroyed")
+local MSG_ENEMY_DESTROYED = hash("enemy_destroyed")
+
+function init(self)
+
+end
+
+function start(self)
+	self.enemies=spawn_enemies(self)
+	self.enemy_bullets={}
+	self.enemy_bullet_timer=0
+	self.is_frozen=false
+	self.enemy_speed=levels[game_info.level].horizontal_speed
+	self.direction=1
+	self.enemy_bullet_counter=0
+end
+function update(self, dt)
+	if self.frozen then return end
+	self.enemy_bullet_timer = self.enemy_bullet_timer + dt
+	if self.enemy_bullet_timer > levels[game_info.level].enemy_fire_frequency+math.random(2) then
+		self.enemy_bullet_timer=0
+		if  #self.enemies<4 or (#self.enemies<10 and math.random(4)>2) then 
+			fire_enemy_bullet_at_player(self)
+		end
+		fire_enemy_bullet(self)				
+	end
+
+	local edge_reached=false
+	local new_dir=0
+	for key, val in pairs(self.enemies) do		
+		local pos=go.get_position(val)
+		if pos.x>common_vars.screen_width-8 and self.direction>0 then
+			edge_reached=true
+			new_dir=-1
+		elseif pos.x<8 and self.direction<0 then
+			edge_reached=true
+			new_dir=1				
+		elseif pos.y<40 then
+			msg.post("/manager", "game_over")
+		else
+			pos.x=pos.x + (self.direction * self.enemy_speed * dt)
+			go.set_position(pos,val)		
+		end
+		--go.set_position(pos,val)
+	end
+
+	if edge_reached then 
+		move_enemies_down(self, new_dir)
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == MSG_START then
+		start(self)		
+	end
+
+	if message_id == MSG_ENEMY_DESTROYED then
+		local idxToRemove=0
+		for i = 1, #self.enemies do
+			if (self.enemies[i] == sender.path) then
+				idxToRemove = i
+				break
+			end
+		end
+		if idxToRemove>0 then
+			table.remove(self.enemies, idxToRemove)
+		end		
+
+		msg.post("/manager", MSG_ENEMY_DESTROYED,{remaining = #self.enemies, points=15})
+
+		if #self.enemies > 2 then
+			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase/2) -- should be a level parameter
+		elseif #self.enemies == 2 then
+			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+2)
+		elseif #self.enemies == 1 then
+			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+8)
+		end	
+	end
+
+	if message_id == MSG_ENEMY_BULLET_DESTROYED then
+		game_info.score = game_info.score+message.points
+		self.enemy_bullet_counter=self.enemy_bullet_counter-1
+		local i=1
+		for key, val in pairs(self.enemy_bullets) do
+			if val == sender.path then 
+				table.remove(self.enemy_bullets,i)
+			end
+			i = i+1
+		end			
+	end
+
+end
+
+function remove_enemy_bullets(self)
+	for key, val in pairs(self.enemy_bullets) do
+		go.delete(val)		
+	end		
+end
+
+function freeze_enemies(self)
+	self.is_frozen=true
+	-- for key, val in pairs(self.enemies) do
+	-- 	msg.post(msg.url(msg.url().socket,val,"enemy"), "freeze")
+	-- end	
+end
+
+function unfreeze_enemies(self)
+	self.is_frozen=false
+	-- for key, val in pairs(self.enemies) do
+	-- 	msg.post(msg.url(msg.url().socket,val,"enemy"), "unfreeze")
+	-- end	
+end
+
+function move_enemies_down(self,dir)	
+	msg.post("/sound_manager", "play_sample",{sample="edge"})
+	local reached_bottom=false
+	for key, val in pairs(self.enemies) do		
+		local pos=go.get_position(val)		
+		pos.y = pos.y - levels[game_info.level].vertical_speed
+		if pos.y < 40 then 
+			reached_bottom=true
+		end
+		go.set_position(pos,val)
+		go.set(msg.url(msg.url().socket,val,"enemy"), "dir", dir)
+	end
+	self.direction=dir
+	if reached_bottom then 
+		msg.post("/manager", "game_over")
+	end		
+end
+
+function make_enemies_faster(self,increment)
+	self.enemy_speed = self.enemy+ increment
+	-- print("requested enemy speed increase "..tostring(increment))
+	-- for key, val in pairs(self.enemies) do
+	-- 	local speed=go.get(msg.url(msg.url().socket,val,"enemy"), "speed")
+	-- 	speed = speed + increment
+	-- 	go.set(msg.url(msg.url().socket,val,"enemy"), "speed", speed)
+	-- end
+end
+
+function spawn_enemies(self)
+	local ret={}
+	local step_x=common_vars.screen_width/8
+	local start_y=common_vars.screen_height-100
+	local step_y=44
+	for i = 1,levels[game_info.level].columns do
+		for n = 1,levels[game_info.level].rows do
+			local posTarget = vmath.vector3(i * step_x,start_y-n*step_y,0)
+			local posStart = vmath.vector3(posTarget.x, posTarget.y + 400 ,0)
+			local enemy = factory.create("#enemy_factory",posStart)
+			--go.set(msg.url(msg.url().socket,enemy,"enemy"), "speed", levels[game_info.level].horizontal_speed)
+			table.insert(ret,enemy)			
+			--msg.post(msg.url(msg.url().socket,enemy,"sprite"), "play_animation", {id = hash(levels[self.level].enemies[n])})
+			msg.post(enemy, "set_sprite",{sprite = levels[game_info.level].enemies[n]})
+			msg.post(enemy, "subscribe", { parent_url = msg.url() }) --working
+			go.animate(enemy, "position.y",go.PLAYBACK_ONCE_FORWARD, posTarget.y, go.EASING_LINEAR, 1)
+		end
+	end	
+	return ret
+end
+
+function fire_enemy_bullet(self)
+	--locate bottom row, should be second to bottom, like the original
+	local lowest_y=5000	
+	local second_lowest_y=5000
+	for key, val in pairs(self.enemies) do
+		local pos=go.get_position(msg.url(msg.url().socket,val,"enemy"))
+		lowest_y=math.min(pos.y, lowest_y)
+		second_lowest_y=math.max(lowest_y, second_lowest_y)
+	end
+	if lowest_y == 5000 then return end
+	if second_lowest_y == 5000 then second_lowest_y = lowest_y end
+	local bottom_aliens={}
+	for key, val in pairs(self.enemies) do
+		local pos=go.get_position(msg.url(msg.url().socket,val,"enemy"))
+		if pos.y == second_lowest_y then
+			table.insert(bottom_aliens, val)
+		end
+	end
+
+	msg.post("/sound_manager", "play_sample",{sample="fire2"})
+	local shooter=math.random(1,#bottom_aliens)
+	local pos=go.get_position(msg.url(msg.url().socket,bottom_aliens[shooter],"enemy"))
+	--msg.post(msg.url(msg.url().socket,bottom_aliens[shooter],"enemy"), "fire",{speed=levels[game_info.level].enemy_bullet_speed})
+	local bullet=factory.create("#enemy_bullet_factory",pos)		
+	msg.post(bullet, "subscribe",  { parent_url = msg.url() })
+	go.set(msg.url(msg.url().socket,bullet,"enemy_bullet"), "speed", levels[game_info.level].enemy_bullet_speed)			
+	table.insert(self.enemy_bullets, bullet)
+	self.enemy_bullet_counter=self.enemy_bullet_counter+1
+end
+
+function fire_enemy_bullet_at_player(self)
+	local player_pos=go.get_position(self.player)
+
+	for key, val in pairs(self.enemies) do
+		local pos=go.get_position(msg.url(msg.url().socket,val,"enemy"))
+		if pos.x>player_pos.x-8 and pos.x<player_pos.x+8 then
+			msg.post("/sound_manager", "play_sample",{sample="fire2"})
+			local bullet=factory.create("#enemy_bullet_factory",pos)		
+			msg.post(bullet, "subscribe",  { parent_url = msg.url() })
+			go.set(msg.url(msg.url().socket,bullet,"enemy_bullet"), "speed", levels[game_info.level].enemy_bullet_speed)
+			table.insert(self.enemy_bullets, bullet)
+			self.enemy_bullet_counter=self.enemy_bullet_counter+1
+			break
+		end		
+	end
+end

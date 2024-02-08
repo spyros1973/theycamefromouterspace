@@ -2,38 +2,40 @@ local vars=require("common")
 
 go.property("dir", 1)
 go.property("speed", 2)
+go.property("alive", true)
 
 function init(self)
-	self.parent=nil
-	self.is_alive=true
+	--self.parent=nil
+	--self.is_alive=true
 	self.is_frozen=false
 end
 
 function on_message(self, message_id, message, sender)	
-	if message_id==hash("trigger_response") and message.enter and self.is_alive and message.other_group~= hash("wall") then
+	if message_id==hash("trigger_response") and message.enter and self.alive and message.other_group~= hash("wall") then
 		msg.post("#collisionobject", "disable")
-		self.is_alive=false
-		msg.post(self.parent, "enemy_destroyed",{points=15})
+		--self.is_alive=false
+		self.alive=false
+		msg.post("/enemies", "enemy_destroyed",{points=15})
 		msg.post("/sound_manager", "play_sample",{sample="explosion1"})
 		sprite.play_flipbook ("#sprite","enemy1_explosion",function()
 			go.delete()
 		end)	
 	end
 
-	if message_id==hash("subscribe") then
-		self.parent=message.parent_url
-	end
+	-- if message_id==hash("subscribe") then
+	-- 	self.parent=message.parent_url
+	-- end
 
 	if message_id==hash("set_sprite") then
 		msg.post("#sprite", "play_animation", {id = hash(message.sprite)})
 	end	
 	
-	if message_id==hash("fire") then
-		-- not used, firing handled from manager script
-		local bullet=factory.create("#bulletFactory",pos)		
-		msg.post(bullet, "subscribe",  { parent_url = self.parent })
-		go.set(msg.url(msg.url().socket,bullet,"enemy_bullet"), "speed", message.speed)			
-	end
+	-- if message_id==hash("fire") then
+	-- 	-- not used, firing handled from manager script
+	-- 	local bullet=factory.create("#bulletFactory",pos)		
+	-- 	msg.post(bullet, "subscribe",  { parent_url = self.parent })
+	-- 	go.set(msg.url(msg.url().socket,bullet,"enemy_bullet"), "speed", message.speed)			
+	-- end
 
 	if message_id==hash("freeze") then
 		self.is_frozen=true
@@ -45,22 +47,21 @@ function on_message(self, message_id, message, sender)
 end
 
 function update( self, dt)
-	if not self.is_alive then return end
+	if not self.alive then return end
 	if self.is_frozen then return end
-	local pos=go.get_position()	
-	pos.x=pos.x + self.dir * self.speed * dt
-	go.set_position(pos)
-	if pos.x>vars.screen_width-8 then
-		print("enemy reached edge at pos "..tostring(pos.x).." speed, dir= "..tostring(self.speed)..", "..tostring(self.dir))
-		msg.post(self.parent, "edge_reached",{edge="right"})
-	elseif pos.x<8 then
-		print("enemy reached edge at pos "..tostring(pos.x).." speed, dir= "..tostring(self.speed)..", "..tostring(self.dir))
-		msg.post(self.parent, "edge_reached",{edge="left"})
-	elseif pos.y<40 then
-		msg.post(self.parent, "game_over")
-	else
-
-	end
+-- 	local pos=go.get_position()	
+-- 	if pos.x>vars.screen_width-8 then
+-- 		print("enemy "..tostring(msg.url()).." reached edge at pos "..tostring(pos.x).." speed, dir= "..tostring(self.speed)..", "..tostring(self.dir))
+-- 		msg.post(self.parent, "edge_reached",{edge="right"})
+-- 	elseif pos.x<8 then
+-- 		print("enemy "..tostring(msg.url()).." reached edge at pos "..tostring(pos.x).." speed, dir= "..tostring(self.speed)..", "..tostring(self.dir))
+-- 		msg.post(self.parent, "edge_reached",{edge="left"})
+-- 	elseif pos.y<40 then
+-- 		msg.post(self.parent, "game_over")
+-- 	else
+-- 		pos.x=pos.x + self.dir * self.speed * dt
+-- 		go.set_position(pos)		
+-- 	end
 end
 
 if message_id==hash("freeze") then
