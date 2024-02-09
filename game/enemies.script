@@ -135,7 +135,7 @@ function move_enemies_down(self,dir)
 end
 
 function make_enemies_faster(self,increment)
-	self.enemy_speed = self.enemy+ increment
+	self.enemy_speed = self.enemy_speed + increment
 	-- print("requested enemy speed increase "..tostring(increment))
 	-- for key, val in pairs(self.enemies) do
 	-- 	local speed=go.get(msg.url(msg.url().socket,val,"enemy"), "speed")

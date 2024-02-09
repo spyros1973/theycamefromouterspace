@@ -52,6 +52,14 @@ Notes:
 Document experience to Defold forum
 - Trigger collisions: many times not firing, because I forgot to set masks to both colliding objects
 - Implementing a pause feature is more complicated than expected (you need a collection proxy, you need to dispatch a set_time_step message, you need to separately handle logic not covered by time step)
+- Understanding messaging: Finding the proper url to post a message is a bit hit and miss, but I ended up having message targets "subscribe" to their caller by sending a message to capture their url. 
+What was more difficult was understanding how to architecture the logic when implementing the aliens behavior; in Space Invaders, once an alien reaches the left or right of the screen, direction is reversed and all aliens move down. If only the alien in question had to change direction and move down, implementation would have been very easy - I would just have to add tis bejavior in the update function. However, since all aliens need to move down and to the opposite horizontal direction, I thought that I could:
+a. create a manager game object, with an alien factory
+b. at level start, the manager spawns aliens in their proper positions and keeps a table with their ids
+c. in the alien script, if it reaches the edge, it posts a message ("edge_reached") back to the manager
+d. if the manager receives this message, it loops through all aliens, moves them down and changes their direction
+This approach didn't work, I guess because the order of operations was undetermined. All aliens of a column sent the "edge_reached" message and their position was changed in both the alien update function and the manager function that handles the "edge_reached" message.
+I ended up creating a container "enemies" object that took the aliens spawning responsibility from manager and handled moving the aliens in its update function, so the actual alien game object just handled collisions and firing.
 
 
 Planet sprite:
