@@ -6,14 +6,15 @@ Some animation when bullets are removed from screen - cases are for enemy bullet
 Better mobile controls
 Implement bonus types: extra life, speed
 Smarter enemy shooting:
-  a) if player is on same x as enemy, shoot
+  a) if player is on same x as enemy, shoot (ok)
   b) if enemy is slightly to the left and another to the right of the player, shoot
-Sound support
-Settings screen (enable / disable sound)
-Add more levels to reach 10 in total
 Add accuracy bonus with animation on game over screen
 
 Done:
+Add more levels to reach 10 in total (ok)
+Scanlines effect (ok)
+Settings screen (enable / disable sound & scanlines) (ok)
+Sound support (ok)
 Enemies should not be destroyed when colliding with wall (ok)
 Add game won screen
 Troubleshoot edge reaching bug (ok... maybe)

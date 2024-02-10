@@ -1,16 +1,13 @@
 local M = {}
 
-M.sound=false
-M.scanlines=true
+M.sound=true
+M.scanlines=false
 
 M.load=function()
 	local filename = sys.get_save_file("sys_save_load", "settings")
-	print(filename)
-	print(sys.exists(filename))
+	print("settings: "..filename)
+	if not sys.exists(filename) then return	end
 	local data = sys.load(filename) 
-	print("loading settings")
-	print(data.sound)
-	print(data.scanlines)
 	M.sound=data.sound or false
 	M.scanlines=data.scanlines or false
 	return data

@@ -5,5 +5,8 @@ table.insert(levels, {enemy_speed_increase=4,horizontal_speed = 44,vertical_spee
 table.insert(levels, {enemy_speed_increase=4.5,horizontal_speed = 44,vertical_speed=18,enemy_bullet_speed=144,enemy_fire_frequency=3,columns=5,rows=4,enemies={"enemy1","enemy3","enemy2","enemy4"}})
 table.insert(levels, {enemy_speed_increase=4.5,horizontal_speed = 44,vertical_speed=18,enemy_bullet_speed=144,enemy_fire_frequency=3,columns=5,rows=5,enemies={"enemy1","enemy1","enemy3","enemy2","enemy4"}})
 table.insert(levels, {enemy_speed_increase=5,horizontal_speed = 46,vertical_speed=18,enemy_bullet_speed=144,enemy_fire_frequency=2,columns=5,rows=5,enemies={"enemy1","enemy2","enemy3","enemy1","enemy2"}})
-table.insert(levels, {enemy_speed_increase=6,horizontal_speed = 48,vertical_speed=22,enemy_bullet_speed=144,enemy_fire_frequency=2,columns=6,rows=4,enemies={"enemy1","enemy2","enemy3","enemy1"}})
+table.insert(levels, {enemy_speed_increase=6,horizontal_speed = 48,vertical_speed=22,enemy_bullet_speed=148,enemy_fire_frequency=2,columns=6,rows=4,enemies={"enemy1","enemy2","enemy3","enemy1"}})
+table.insert(levels, {enemy_speed_increase=7,horizontal_speed = 52,vertical_speed=22,enemy_bullet_speed=148,enemy_fire_frequency=1.5,columns=5,rows=5,enemies={"enemy1","enemy2","enemy3","enemy1","enemy3"}})
+table.insert(levels, {enemy_speed_increase=8,horizontal_speed = 54,vertical_speed=22,enemy_bullet_speed=152,enemy_fire_frequency=1.4,columns=6,rows=5,enemies={"enemy1","enemy2","enemy3","enemy1","enemy3","enemy2"}})
+table.insert(levels, {enemy_speed_increase=9,horizontal_speed = 58,vertical_speed=22,enemy_bullet_speed=152,enemy_fire_frequency=1.2,columns=6,rows=5,enemies={"enemy1","enemy2","enemy3","enemy1","enemy3","enemy2"}})
 return levels
