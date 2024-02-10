@@ -1,6 +1,9 @@
+local settings = require("settings")
+
 function init(self)
 	self.input_timer=2
 	msg.post(".", "acquire_input_focus")
+	gui.set_visible(gui.get_node("scanlines"), settings.scanlines)
 	gui.set_scale(gui.get_node("text1"), vmath.vector3(0,0,1))
 	--gui.set_scale(gui.get_node("text2"), vmath.vector3(0,0,1))
 	--gui.set_scale(gui.get_node("text3"), vmath.vector3(0,0,1))

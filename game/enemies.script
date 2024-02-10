@@ -19,12 +19,13 @@ function start(self)
 	self.direction=1
 	self.enemy_bullet_counter=0
 end
+
 function update(self, dt)
 	if self.frozen then return end
 	self.enemy_bullet_timer = self.enemy_bullet_timer + dt
 	if self.enemy_bullet_timer > levels[game_info.level].enemy_fire_frequency+math.random(2) then
 		self.enemy_bullet_timer=0
-		if  #self.enemies<4 or (#self.enemies<10 and math.random(4)>2) then 
+		if  #self.enemies<4 or (#self.enemies<12 and math.random(5)>2) then 
 			fire_enemy_bullet_at_player(self)
 		end
 		fire_enemy_bullet(self)				
@@ -76,9 +77,9 @@ function on_message(self, message_id, message, sender)
 		if #self.enemies > 2 then
 			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase/2) -- should be a level parameter
 		elseif #self.enemies == 2 then
-			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+2)
+			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+4)
 		elseif #self.enemies == 1 then
-			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+8)
+			make_enemies_faster(self, levels[game_info.level].enemy_speed_increase+16)
 		end	
 	end
 

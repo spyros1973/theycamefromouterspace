@@ -1,5 +1,6 @@
 local game_info = require("game/game_info")
 local common_vars = require("common")
+local settings = require("settings")
 
 local function anim1(node, d)
 	-- set scale to 70%
@@ -22,6 +23,7 @@ end
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
+	gui.set_visible(gui.get_node("scanlines"), settings.scanlines)
 	print("gui url: "..msg.url())	
 	gui.set_text (gui.get_node("score"), string.format("PTS %05d", 0))
 	self.btn_pause = gui.get_node("btn_pause")		
