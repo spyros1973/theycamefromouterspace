@@ -26,6 +26,7 @@ function update(self, dt)
 	self.enemy_bullet_timer = self.enemy_bullet_timer + dt
 	if self.enemy_bullet_timer > levels[game_info.level].enemy_fire_frequency+math.random(2) then
 		self.enemy_bullet_timer=0
+		if #self.enemy_bullets>10 then return end
 		if #self.enemies<4 or (#self.enemies<12 and math.random(5)>2) then 
 			fire_enemy_bullet_at_player(self)
 		end
