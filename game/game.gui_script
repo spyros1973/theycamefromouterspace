@@ -60,10 +60,16 @@ function final(self)
 end
 
 function update(self, dt)
-	--score animation
+	
 	if self.is_game_over then
 		if self.game_over_key_timer > 0 then 
 			self.game_over_key_timer = self.game_over_key_timer - 1/60
+		end
+		if self.game_over_bonus > 0 then 
+			self.game_over_bonus = self.game_over_bonus - 0.5
+			self.game_over_points = self.game_over_points + 0.5
+			gui.set_text(gui.get_node("txt_score"), "Final score: "..tostring(math.ceil(self.game_over_points)).." pts")
+			gui.set_text (gui.get_node("score"), string.format("PTS %05d", math.ceil(self.game_over_points)))
 		end
 	end
 
@@ -200,15 +206,15 @@ function on_message(self, message_id, message, sender)
 			self.is_game_over=true
 			self.game_over_key_timer=2
 			self.game_won=message.game_won
-			local acc = 0
+			self.game_over_points=message.game_over_score
+			self.game_over_bonus=message.game_over_bonus
+			local acc = message.game_over_bonus
 			local acc_text= "Accuracy: 00%"
-			--set self.bonus points to add in score (animation on update)
-			if game_info.shots_fired>0 then 
-				acc=game_info.shots_hit*100/game_info.shots_fired 
-				acc_text=string.format("Accuracy: %02d%% (%d - %d)",acc,game_info.shots_hit,game_info.shots_fired)
+			if acc > 0 then
+				acc_text=string.format("Accuracy: %02d%% (%d - %d)",self.game_over_bonus,game_info.shots_hit,game_info.shots_fired)
 			end
-						
-			gui.set_text(gui.get_node("txt_score"), "Final score: "..game_info.score.." pts")
+					
+			gui.set_text(gui.get_node("txt_score"), "Final score: "..tostring(self.game_over_points).." pts")
 			gui.set_text(gui.get_node("txt_accuracy"), acc_text)
 		end
 	end

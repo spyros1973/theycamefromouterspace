@@ -8,9 +8,10 @@ Implement bonus types: extra life, speed
 Smarter enemy shooting:
   a) if player is on same x as enemy, shoot (ok)
   b) if enemy is slightly to the left and another to the right of the player, shoot
-Add accuracy bonus with animation on game over screen
+
 
 Done:
+Add accuracy bonus with animation on game over screen (ok)
 Add more levels to reach 10 in total (ok)
 Scanlines effect (ok)
 Settings screen (enable / disable sound & scanlines) (ok)

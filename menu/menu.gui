@@ -157,8 +157,8 @@ nodes {
 }
 nodes {
   position {
-    x: 135.0
-    y: 36.0
+    x: 202.0
+    y: 624.0
     z: 0.0
     w: 1.0
   }
@@ -176,7 +176,7 @@ nodes {
   }
   size {
     x: 200.0
-    y: 50.0
+    y: 30.0
     z: 0.0
     w: 1.0
   }
@@ -191,7 +191,7 @@ nodes {
   text: "<text>"
   font: "impostor"
   id: "info"
-  xanchor: XANCHOR_NONE
+  xanchor: XANCHOR_RIGHT
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
   outline {
@@ -532,7 +532,7 @@ nodes {
 nodes {
   position {
     x: 135.0
-    y: 300.0
+    y: -120.0
     z: 0.0
     w: 1.0
   }
@@ -550,7 +550,7 @@ nodes {
   }
   size {
     x: 200.0
-    y: 200.0
+    y: 240.0
     z: 0.0
     w: 1.0
   }
@@ -583,14 +583,14 @@ nodes {
   template_node_child: false
   size_mode: SIZE_MODE_MANUAL
   custom_type: 0
-  enabled: false
+  enabled: true
   visible: true
   material: ""
 }
 nodes {
   position {
     x: 0.0
-    y: 71.0
+    y: 90.0
     z: 0.0
     w: 1.0
   }
@@ -613,9 +613,9 @@ nodes {
     w: 1.0
   }
   color {
-    x: 1.0
+    x: 0.0
     y: 1.0
-    z: 1.0
+    z: 0.0
     w: 1.0
   }
   type: TYPE_TEXT
@@ -657,7 +657,7 @@ nodes {
 nodes {
   position {
     x: -90.0
-    y: 24.0
+    y: 44.0
     z: 0.0
     w: 1.0
   }
@@ -724,7 +724,7 @@ nodes {
 nodes {
   position {
     x: 54.0
-    y: 24.0
+    y: 44.0
     z: 0.0
     w: 1.0
   }
@@ -850,7 +850,7 @@ nodes {
 nodes {
   position {
     x: -90.0
-    y: -40.0
+    y: -20.0
     z: 0.0
     w: 1.0
   }
@@ -917,7 +917,7 @@ nodes {
 nodes {
   position {
     x: 54.0
-    y: -40.0
+    y: -20.0
     z: 0.0
     w: 1.0
   }
@@ -1027,6 +1027,140 @@ nodes {
   adjust_mode: ADJUST_MODE_FIT
   line_break: false
   parent: "btn_scanlines"
+  layer: ""
+  inherit_alpha: true
+  alpha: 1.0
+  outline_alpha: 1.0
+  shadow_alpha: 1.0
+  template_node_child: false
+  text_leading: 1.0
+  text_tracking: 0.0
+  custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
+}
+nodes {
+  position {
+    x: -91.0
+    y: -100.0
+    z: 0.0
+    w: 1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 0.6
+    y: 0.6
+    z: 1.0
+    w: 1.0
+  }
+  size {
+    x: 64.0
+    y: 32.0
+    z: 0.0
+    w: 1.0
+  }
+  color {
+    x: 0.702
+    y: 0.702
+    z: 0.702
+    w: 1.0
+  }
+  type: TYPE_TEXT
+  blend_mode: BLEND_MODE_ALPHA
+  text: "v1.0"
+  font: "impostor"
+  id: "text_version"
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_BOTTOM
+  pivot: PIVOT_W
+  outline {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  shadow {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  adjust_mode: ADJUST_MODE_FIT
+  line_break: false
+  parent: "panel_settings"
+  layer: ""
+  inherit_alpha: true
+  alpha: 1.0
+  outline_alpha: 1.0
+  shadow_alpha: 1.0
+  template_node_child: false
+  text_leading: 1.0
+  text_tracking: 0.0
+  custom_type: 0
+  enabled: true
+  visible: true
+  material: ""
+}
+nodes {
+  position {
+    x: 90.0
+    y: -100.0
+    z: 0.0
+    w: 1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 0.6
+    y: 0.6
+    z: 1.0
+    w: 1.0
+  }
+  size {
+    x: 64.0
+    y: 32.0
+    z: 0.0
+    w: 1.0
+  }
+  color {
+    x: 0.702
+    y: 0.702
+    z: 0.702
+    w: 1.0
+  }
+  type: TYPE_TEXT
+  blend_mode: BLEND_MODE_ALPHA
+  text: "by Spyros Paraschis"
+  font: "impostor"
+  id: "text_by"
+  xanchor: XANCHOR_RIGHT
+  yanchor: YANCHOR_BOTTOM
+  pivot: PIVOT_E
+  outline {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  shadow {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  adjust_mode: ADJUST_MODE_FIT
+  line_break: false
+  parent: "panel_settings"
   layer: ""
   inherit_alpha: true
   alpha: 1.0

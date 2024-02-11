@@ -139,7 +139,8 @@ function on_message(self, message_id, message, sender)
 				else
 					game_info.level = game_info.level+1
 					msg.post(self.player, "remove_bullets")
-					remove_enemy_bullets(self)
+					msg.post("/enemies", "remove_bullets")
+					--remove_enemy_bullets(self)
 					start_level(self)
 				end
 			end)					
@@ -173,11 +174,18 @@ function on_message(self, message_id, message, sender)
 		--print("Game over")
 		--print("Shots: "..tostring(game_info.shots_hit).." / "..tostring(game_info.shots_fired))
 		game_info.mode="gameover"
+		local game_over_bonus=0
+		if game_info.shots_fired>0 then 
+			game_over_bonus=game_info.shots_hit*100/game_info.shots_fired 
+		end		
+		local game_over_score=game_info.score
+		game_info.score = game_info.score + game_over_bonus
+		msg.post("/sound_manager", "play_sample",{sample="gameover"})
 		msg.post("startup:/handler#game", "set_time_step", {factor = 0, mode = 1})	
-		msg.post("#game", "game_over",{state = true, game_won = message.won})
+		msg.post("#game", "game_over",{state = true, game_won = message.won, game_over_bonus = game_over_bonus, game_over_score = game_over_score})
 		local hi=high_score.load()
 		if game_info.score>hi then
-			high_score.save(game_info.score)
+			high_score.save(math.ceil(game_info.score))
 			msg.post("#game", "new_high")
 		end		
 	end

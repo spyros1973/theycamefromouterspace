@@ -171,6 +171,7 @@ function on_message(self, message_id, message, sender)
 	if message_id == MSG_REMOVE_BULLETS then
 		for k,v in pairs(self.bullets) do
 			go.delete(v)
+			table.remove(self.bullets,k)
 		end
 		self.bullets_on_screen=0
 		msg.post("bullet_display", "update",{max_bullets=game_info.player_max_bullets,fired_bullets=self.bullets_on_screen})
