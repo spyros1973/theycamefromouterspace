@@ -15,6 +15,6 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == MSG_PLAY_SAMPLE and settings.sound then
-		sound.play("#"..message.sample)
+		sound.play("#"..message.sample,{gain=settings.volume})
 	end	
 end
