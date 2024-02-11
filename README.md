@@ -5,6 +5,7 @@ A Space Invaders inspired game made with Defold.
 It's basically a test project for learning Defold and Lua.
 
 ![image](https://github.com/spyros1973/theycamefromouterspace/assets/1493552/181b7f15-ad01-41c8-93b5-91d7d7435c94)
+![image](https://github.com/spyros1973/theycamefromouterspace/assets/1493552/18dd12a2-d05d-4e49-9d23-96fb7f70c850)
 
 ---
 ### Credits:
