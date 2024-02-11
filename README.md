@@ -37,5 +37,3 @@ Comp-3 Interactive (https://comp3interactive.itch.io/invaders-from-outerspace-fu
   - Explosions - Jesús Lastra
   - Misc - artisticdude
 
-- Music:
-HydroGene
