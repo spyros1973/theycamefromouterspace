@@ -35,11 +35,10 @@ function update(self, dt)
 		end
 	end
 
-	if self.enemy_bullet_timer+1 > levels[game_info.level].enemy_fire_frequency-math.random(2) and #self.enemies<3 then
-		self.enemy_bullet_timer=1
-		fire_enemy_bullet(self)
-		fire_enemy_bullet(self)
-	end
+	--if self.enemy_bullet_timer+1 > levels[game_info.level].enemy_fire_frequency-math.random(2) and #self.enemies<3 then
+	--	self.enemy_bullet_timer=1
+	--	fire_enemy_bullet(self)
+	--end
 	
 	local edge_reached=false
 	local new_dir=0
