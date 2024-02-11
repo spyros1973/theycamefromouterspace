@@ -12,7 +12,7 @@ fullscreen = 0
 
 [android]
 input_method = HiddenInputField
-package = gr.paraschis.invaders
+package = gr.paraschis.theycamefromouterspace
 app_icon_192x192 = /assets/GameIcon_192.png
 
 [project]
@@ -22,4 +22,9 @@ developer = Spyros Paraschis
 [graphics]
 default_texture_min_filter = nearest
 default_texture_mag_filter = nearest
+
+[html5]
+splash_image = /assets/GameIcon.png
+scale_mode = downscale_fit
+show_fullscreen_button = 0
 
