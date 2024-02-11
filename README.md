@@ -18,6 +18,9 @@ It's basically a test project for learning Defold and Lua.
 - Mobile support
 
 ---
+### Try it!
+An HTML5 build of the game can be found at [my homepage](http://www.paraschis.gr/theycamefromouterspace).
+
 ### Credits:
 
 - Planet sprite:
