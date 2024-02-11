@@ -8,6 +8,16 @@ It's basically a test project for learning Defold and Lua.
 ![image](https://github.com/spyros1973/theycamefromouterspace/assets/1493552/18dd12a2-d05d-4e49-9d23-96fb7f70c850)
 
 ---
+### Features:
+- 10 levels
+- Classic Space Invaders walls
+- A poor scanlines effect
+- Sound fx with volume controls
+- A game ending screen
+- Bonus pickups to increase player fire rate
+- Mobile support
+
+---
 ### Credits:
 
 - Planet sprite:
